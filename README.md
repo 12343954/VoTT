@@ -42,6 +42,8 @@
 - feat: Highlight the region on mouse enter each row in yolo detection dialog
 - fix: Remove the last toast immediately, and show the next toast with result smoothly, avoid occluding the main UI
 
+![image](https://github.com/12343954/VoTT/assets/1804003/1144b9a5-490b-4939-a0f9-d5e21a43856f)
+
 <br /><hr /><br />
 
 [![Build Status](https://dev.azure.com/msft-vott/VoTT/_apis/build/status/VoTT/Microsoft.VoTT?branchName=master)](https://dev.azure.com/msft-vott/VoTT/_build/latest?definitionId=25&branchName=master)
