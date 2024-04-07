@@ -5,6 +5,8 @@ import {
 import registerMixins from "../registerMixins";
 import { IpcMainProxy } from "./common/ipcMainProxy";
 import LocalFileSystem from "./providers/storage/localFileSystem";
+process.setMaxListeners(0);
+// require('events').EventEmitter.defaultMaxListeners = 15;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

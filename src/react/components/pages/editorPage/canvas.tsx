@@ -119,7 +119,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
     public render = () => {
         const className = this.state.enabled ? "canvas-enabled" : "canvas-disabled";
-
         return (
             <Fragment>
                 <Confirm title={strings.editorPage.canvas.removeAllRegions.title}
@@ -199,6 +198,16 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     public getSelectedRegions = (): IRegion[] => {
         const selectedRegions = this.editor.RM.getSelectedRegionsBounds().map((rb) => rb.id);
         return this.state.currentAsset.regions.filter((r) => selectedRegions.find((id) => r.id === id));
+    }
+
+    // smith add 2024-4-4
+    public onHighlightRegions = (regions: IRegion[]) => {
+        if (regions.length == 0) return;
+        for (var region of regions) {
+            // console.log('onHighlightRegions from canvas.tsx', region.id)
+            this.editor.RM.selectRegionById(region.id)
+            // this.onRegionSelected(region.id, true);
+        }
     }
 
     public updateCanvasToolsRegionTags = (): void => {

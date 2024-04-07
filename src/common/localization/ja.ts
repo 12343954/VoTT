@@ -283,6 +283,7 @@ export const japanese: IAppStrings = {
             saveProject: "プロジェクトを保存", // Save Project,
             exportProject: "プロジェクトをエクスポート",  // Export Project,
             activeLearning: "アクティブ ラーニング",  // Active Learning"
+            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

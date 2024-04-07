@@ -284,6 +284,7 @@ export const korean: IAppStrings = {
             saveProject: "프로젝트 저장", // Save Project,
             exportProject: "프로젝트 내보내기",  // Export Project,
             activeLearning: "Active Learning",  // Active Learning"
+            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

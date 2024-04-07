@@ -12,6 +12,7 @@ export class IpcRendererProxy {
         }
 
         IpcRendererProxy.ipcRenderer = (window as any).require("electron").ipcRenderer;
+        IpcRendererProxy.ipcRenderer.setMaxListeners(20);
         IpcRendererProxy.ipcRenderer.on("ipc-renderer-proxy", (sender, message: IpcProxyMessage<any>) => {
             const deferred = IpcRendererProxy.pending[message.id];
 

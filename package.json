@@ -1,19 +1,50 @@
 {
     "name": "vott",
-    "version": "2.2.0",
+    "version": "2.2.2",
     "author": {
-        "name": "Microsoft",
-        "url": "https://github.com/Microsoft/VoTT"
+        "name": "12343954",
+        "url": "https://github.com/12343954/VoTT"
     },
     "description": "Visual Object Tagging Tool (VoTT) - an annotation and labeling tool for images and video.",
-    "homepage": "https://github.com/Microsoft/VoTT",
+    "homepage": "https://github.com/12343954/VoTT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Microsoft/VoTT.git"
+        "url": "https://github.com/12343954/VoTT.git"
     },
     "license": "MIT",
     "private": true,
     "main": "build/main.js",
+    "config": {
+        "electron": {
+            "mirror": "https://registry.npmmirror.com/-/binary/electron/"
+        }
+    },
+    "scripts": {
+        "start": "nf start -p 3000",
+        "compile": "tsc",
+        "build": "react-scripts build",
+        "webpack:dev": "webpack --config ./config/webpack.dev.js",
+        "webpack:prod": "webpack -p --config ./config/webpack.prod.js",
+        "react-start": "react-scripts start",
+        "electron:run:dev": "npm run webpack:dev && electron . --remote-debugging-port=9223",
+        "electron:run:prod": "npm run webpack:prod && electron . --remote-debugging-port=9223",
+        "electron:start:dev": "npm run webpack:dev && npm run electron-start",
+        "electron:start:prod": "npm run webpack:prod && npm run electron-start",
+        "electron-start": "node --trace-warnings src/electron/start",
+        "eject": "react-scripts eject",
+        "release-pr": "./scripts/release-pr.sh",
+        "release-web": "npm run build && npm run webpack:prod",
+        "release-ci": "bash ./scripts/build.sh",
+        "release": "npm run build && npm run webpack:prod && electron-builder",
+        "pretest": "./node_modules/.bin/tslint 'src/**/*.ts*'",
+        "lintfix": "./node_modules/.bin/tslint 'src/**/*.ts*' --fix",
+        "test": "react-scripts test --env=jsdom --silent",
+        "test:ci": "cross-env CI=true npm run test",
+        "test:coverage": "npm run test -- --coverage",
+        "plato": "scripts/generate-report.sh -o report -v $(node -pe \"require('./package.json').version\") -c $(git rev-parse --short HEAD)",
+        "postinstall": "electron-builder install-app-deps",
+        "predebug": "npm run build && npm run webpack:dev"
+    },
     "dependencies": {
         "@azure/storage-blob": "^10.3.0",
         "@tensorflow/tfjs": "^1.0.3",
@@ -59,41 +90,6 @@
         "vott-ct": "2.1.24",
         "vott-react": "^0.2.10"
     },
-    "scripts": {
-        "start": "nf start -p 3000",
-        "compile": "tsc",
-        "build": "react-scripts build",
-        "webpack:dev": "webpack --config ./config/webpack.dev.js",
-        "webpack:prod": "webpack -p --config ./config/webpack.prod.js",
-        "react-start": "react-scripts start",
-        "electron:run:dev": "npm run webpack:dev && electron . --remote-debugging-port=9223",
-        "electron:run:prod": "npm run webpack:prod && electron . --remote-debugging-port=9223",
-        "electron:start:dev": "npm run webpack:dev && npm run electron-start",
-        "electron:start:prod": "npm run webpack:prod && npm run electron-start",
-        "electron-start": "node src/electron/start",
-        "eject": "react-scripts eject",
-        "release-pr": "./scripts/release-pr.sh",
-        "release-web": "npm run build && npm run webpack:prod",
-        "release-ci": "bash ./scripts/build.sh",
-        "release": "npm run build && npm run webpack:prod && electron-builder",
-        "pretest": "./node_modules/.bin/tslint 'src/**/*.ts*'",
-        "lintfix": "./node_modules/.bin/tslint 'src/**/*.ts*' --fix",
-        "test": "react-scripts test --env=jsdom --silent",
-        "test:ci": "cross-env CI=true npm run test",
-        "test:coverage": "npm run test -- --coverage",
-        "plato": "scripts/generate-report.sh -o report -v $(node -pe \"require('./package.json').version\") -c $(git rev-parse --short HEAD)",
-        "postinstall": "electron-builder install-app-deps",
-        "predebug": "npm run build && npm run webpack:dev"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
-    "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not ie <= 11",
-        "not op_mini all"
-    ],
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.5.0",
         "@types/axios": "^0.14.0",
@@ -111,6 +107,8 @@
         "@types/reactstrap": "^6.4.3",
         "@types/redux-logger": "^3.0.6",
         "@types/redux-mock-store": "^1.0.0",
+        "browserslist": "^4.22.2",
+        "caniuse-lite": "^1.0.30001571",
         "cross-env": "^5.2.0",
         "electron": "^3.0.13",
         "electron-builder": "^22.6.0",
@@ -132,6 +130,15 @@
         "webpack-cli": "^3.1.2",
         "webpack-merge": "^4.1.5"
     },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ],
     "engines": {
         "node": ">=10.14.2",
         "npm": ">=6.4.1"

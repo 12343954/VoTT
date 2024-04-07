@@ -276,6 +276,7 @@ export const english: IAppStrings = {
             saveProject: "Save Project",
             exportProject: "Export Project",
             activeLearning: "Active Learning",
+            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

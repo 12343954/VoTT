@@ -1,4 +1,48 @@
-# VoTT is no longer being maintained!
+### Microsoft no longer maintains VoTT ! (so sad ...)
+# (2024-4-7) I add automatically annotate image via YOLOv3 auto-detect webapi  into VoTT 2.2.2
+
+- feat: Automatically annotate images via YOLOv3 auto-detect webapi (with [AlexeyAB](https://github.com/AlexeyAB/darknet)'s YOLOv3 `yolo_cpp_dll.dll` which written in 2019, the fastest YOLO on RTX20 series graphics cards, 30+ fps)
+
+    shortcut key⌨: Q
+
+    - webapi : http://localhost:50505/api/YOLOv3/detect/${image_path} , only accept local image path
+
+        ```
+        nvidia-smi
+        Driver Version: 456.71  CUDA Version: 11.1
+
+        nvcc -V
+        nvcc: NVIDIA (R) Cuda compiler driver
+        Copyright (c) 2005-2019 NVIDIA Corporation
+        Built on Wed_Oct_23_19:32:27_Pacific_Daylight_Time_2019
+        Cuda compilation tools, release 10.2, V10.2.89
+
+        cuDnn 10.2
+        ```
+
+    - json result:
+        ```
+        {
+            eta: 28, // ms
+            diff: 0, // means no coincident recognition（green toast）
+                  n, // means duplicate detection (yellow toast),
+            detect: [{
+                id, // detection index
+                x,y,w,h,
+                obj_id, obj_name, prob, // max prob
+                obj_IDs: [ // the same region, order by prob desc
+                    {obj_id, obj_name, prob},
+                    ...
+                    ]
+                },
+                ...
+            ]
+        }
+        ```
+- feat: Highlight the region on mouse enter each row in yolo detection dialog
+- fix: Remove the last toast immediately, and show the next toast with result smoothly, avoid occluding the main UI
+
+<br /><hr /><br />
 
 [![Build Status](https://dev.azure.com/msft-vott/VoTT/_apis/build/status/VoTT/Microsoft.VoTT?branchName=master)](https://dev.azure.com/msft-vott/VoTT/_build/latest?definitionId=25&branchName=master)
 [![Code Coverage](https://codecov.io/gh/Microsoft/VoTT/branch/master/graph/badge.svg)](https://codecov.io/gh/Microsoft/VoTT)
@@ -63,14 +107,14 @@ VoTT can be installed as a native application or run from source. VoTT is also a
 
 ### Download and install a release package for your platform (recommended)
 
-VoTT is available for Windows, Linux and OSX. Download the appropriate platform package/installer from [GitHub Releases](https://github.com/Microsoft/VoTT/releases). `v2` releases will be prefixed by `2.x`.
+VoTT is available for Windows, Linux and OSX. Download the appropriate platform package/installer from [GitHub Releases](https://github.com/12343954/VoTT/releases). `v2` releases will be prefixed by `2.x`.
 
 ### Build and run from source
 
 VoTT requires [NodeJS (>= 10.x, Dubnium) and NPM](https://github.com/nodejs/Release)
 
    ```bash
-    git clone https://github.com/Microsoft/VoTT.git
+    git clone https://github.com/12343954/VoTT.git
     cd VoTT
     npm ci
     npm start

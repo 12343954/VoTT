@@ -18,6 +18,7 @@ export enum ToolbarItemName {
     SaveProject = "saveProject",
     ExportProject = "exportProject",
     ActiveLearning = "activeLearning",
+    YoloDetect = "yoloDetect",
 }
 
 export enum ToolbarItemGroup {
@@ -25,6 +26,7 @@ export enum ToolbarItemGroup {
     Regions = "regions",
     Navigation = "navigation",
     Project = "project",
+    YOLO = "yolo",
 }
 
 /**
@@ -68,6 +70,25 @@ export default function registerToolbar() {
     });
 
     ToolbarItemFactory.register({
+        name: ToolbarItemName.ActiveLearning,
+        tooltip: strings.editorPage.toolbar.activeLearning,
+        icon: "fas fa-graduation-cap",
+        group: ToolbarItemGroup.Canvas,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
+    });
+
+    //smith add 2024-4-2
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.YoloDetect,
+        tooltip: strings.editorPage.toolbar.yoloDetect,
+        icon: "far fa-eye",
+        group: ToolbarItemGroup.YOLO,
+        type: ToolbarItemType.State,
+        accelerators: ["Q", "q"],
+    });
+
+    ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRegions,
         tooltip: strings.editorPage.toolbar.copy,
         icon: "fa-copy",
@@ -101,15 +122,6 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+Delete", "CmdOrCtrl+Backspace"],
-    });
-
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.ActiveLearning,
-        tooltip: strings.editorPage.toolbar.activeLearning,
-        icon: "fas fa-graduation-cap",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
     ToolbarItemFactory.register({

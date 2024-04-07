@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import SplitPane from "react-split-pane";
 import { bindActionCreators } from "redux";
+import shortid from "shortid";
 import { SelectionMode } from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
 import { strings } from "../../../../common/strings";
@@ -11,6 +12,7 @@ import {
     AssetState, AssetType, EditorMode, IApplicationState,
     IAppSettings, IAsset, IAssetMetadata, IProject, IRegion,
     ISize, ITag, IAdditionalPageSettings, AppError, ErrorCode,
+    RegionType,
 } from "../../../../models/applicationState";
 import { IToolbarItemRegistration, ToolbarItemFactory } from "../../../../providers/toolbar/toolbarItemFactory";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
@@ -31,6 +33,8 @@ import Alert from "../../common/alert/alert";
 import Confirm from "../../common/confirm/confirm";
 import { ActiveLearningService } from "../../../../services/activeLearningService";
 import { toast } from "react-toastify";
+
+import Yolov3Service from '../../../../services/yolov3Service'
 
 /**
  * Properties for Editor Page
@@ -124,6 +128,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private renameTagConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteTagConfirm: React.RefObject<Confirm> = React.createRef();
 
+    //smith add 2024-4-2
+    private yolov3Service: Yolov3Service = null;
+
     public async componentDidMount() {
         const projectId = this.props.match.params["projectId"];
         if (this.props.project) {
@@ -134,6 +141,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
+        this.yolov3Service = new Yolov3Service();
     }
 
     public async componentDidUpdate(prevProps: Readonly<IEditorPageProps>) {
@@ -561,6 +569,144 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.ActiveLearning:
                 await this.predictRegions();
                 break;
+
+            // smith added 2024-4-2
+            case ToolbarItemName.YoloDetect:
+                await this.yoloAutoDetect();
+        }
+    }
+
+    // smith added 2024-4-2
+    private yoloAutoDetect = async () => {
+        try {
+            try {
+                // remove toast immediately, and show the next result smoothly
+                // document.querySelectorAll('[class~="Toastify__toast--success"]').forEach((k: any) => k.style.display = 'none');
+                document.querySelectorAll('[class~="Toastify__toast"]').forEach(k => k.remove())
+            } catch { }
+
+            let path = decodeURIComponent(this.state.selectedAsset.asset.path.substring(5)).replace(/\//g, '\\');
+            let result = await this.yolov3Service.DetectImageAsync(encodeURIComponent(path));
+            if (result.return_code) {
+                if (result.data.detect) {
+                    toast(<div>
+                        <h4>YOLOv3 Detected</h4>
+                        <div style={{ margin: `5% 10%` }}>
+                            <table style={{ width: '100%' }}>
+                                <thead><tr>
+                                    <td style={{ width: '30px' }}></td>
+                                    <td style={{ width: 'unset' }}></td>
+                                    <td style={{ width: '40px' }}></td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {result.data.detect.sort((a, b) => a.id - b.id)
+                                        .map(k => <tr key={k.id} style={{ color: k.obj_IDs.length > 1 ? 'black' : 'unset' }}
+                                            onMouseEnter={() => this.onHighlightRegion(k, 'enter')}
+                                            onMouseLeave={() => this.onHighlightRegion(k, 'leave')}>
+                                            <td>{k.id}</td>
+                                            <td>{k.obj_IDs.map(kk => kk.name).join(', ')}</td>
+                                            <td>{(k.prob * 100).toFixed(2)}%</td></tr>)}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>, {
+                        position: 'top-center',
+                        autoClose: result.data.diff == 0 ? 5000 : 15000,
+                        type: result.data.diff == 0 ? "success" : 'warning'
+                    })
+                }
+
+                let old_regions = JSON.parse(JSON.stringify(this.state.selectedAsset.regions)); // deep copy
+                let new_regions: IRegion[];
+                if (this.state.selectedAsset.regions.length == 0) {
+                    new_regions = result.data.detect.map((k: any, i: number): IRegion => {
+                        return {
+                            id: shortid.generate(),
+                            tags: k.obj_IDs.map(p => p.name),
+                            type: RegionType.Rectangle,
+                            boundingBox: { left: k.x, top: k.y, width: k.w, height: k.h },
+                            points: [
+                                { x: k.x, y: k.y }, // Top left
+                                { x: k.x + k.w, y: k.y }, // Top Right
+                                { x: k.x, y: k.y + k.h }, // Bottom Left
+                                { x: k.x + k.w, y: k.y + k.h }, // Bottom Right
+                            ]
+                        }
+                    })
+                } else {
+                    // name_id, name, x, y, w, h, prob, center:"633, 171", List<id_names> obj_IDs
+                    new_regions = result.data.detect.map((k: any, i: number): IRegion => {
+                        let center = k.center.split(',')
+                        center = { x: parseFloat(center[0]), y: parseFloat(center[1]) }
+
+                        let exist = old_regions.filter(old => Math.hypot(
+                            (center.x - 0.5 * (old.boundingBox.left + old.boundingBox.width)),
+                            (center.y - 0.5 * (old.boundingBox.top + old.boundingBox.height)),
+                        ) < 100)
+                        // console.log('11111111111111111111111')
+                        // debugger;
+                        if (exist.length) {
+                            // console.log('exist', exist)
+                            // console.log('exist.tags', exist.tags)
+                            // console.log('k.obj_IDs.map(p => p.name)', k.obj_IDs.map(p => p.name))
+
+                            return { ...exist, ...{ tags: [...exist.tags, ...k.obj_IDs.map(p => p.name)] } }
+                        } else {
+                            // console.log('2222222222222')
+                            return {
+                                id: shortid.generate(),
+                                tags: k.obj_IDs.map(p => p.name),
+                                type: RegionType.Rectangle,
+                                boundingBox: { left: k.x, top: k.y, width: k.w, height: k.h },
+                                points: [
+                                    { x: k.x, y: k.y }, // Top left
+                                    { x: k.x + k.w, y: k.y }, // Top Right
+                                    { x: k.x, y: k.y + k.h }, // Bottom Left
+                                    { x: k.x + k.w, y: k.y + k.h }, // Bottom Right
+                                ]
+                            }
+                        }
+                    })
+                }
+                this.setState({
+                    selectedAsset: {
+                        ...this.state.selectedAsset,
+                        regions: new_regions,
+                        asset: {
+                            ...this.state.selectedAsset.asset,
+                            state: AssetState.Tagged
+                        }
+                    }
+                })
+            } else {
+                toast.error(result.message || "YOLOv3 auto-detect error!")
+            }
+        } catch (e) {
+            console.log(e)
+            toast.error(e.message);
+        }
+    }
+
+    // smith added 2024-4-4
+    private onHighlightRegion = async (detection: any, type: string) => {
+        // console.log(type, detection, this.state.selectedAsset.regions);
+        switch (type) {
+            case 'enter':
+                let center = detection.center.split(',')
+                center = { x: parseFloat(center[0]), y: parseFloat(center[1]) }
+
+                let regions: IRegion[] = this.state.selectedAsset.regions.filter(p => Math.hypot(
+                    center.x - (p.points[0].x + 0.5 * (p.points[1].x - p.points[0].x)),
+                    center.y - (p.points[0].y + 0.5 * (p.points[3].y - p.points[0].y))) < 100)
+
+                // console.log('focus highlight region', regions)
+                this.canvas.current.onHighlightRegions(regions)
+                this.onSelectedRegionsChanged(regions)
+                break;
+            case 'leave':
+                this.onSelectedRegionsChanged([])
+                break;
         }
     }
 
@@ -641,6 +787,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         } catch (err) {
             console.warn("Error computing asset size");
         }
+
+        // console.log(assetMetadata)
 
         this.setState({
             selectedAsset: assetMetadata,
