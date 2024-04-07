@@ -3,6 +3,8 @@
 
 - feat: Automatically annotate images via YOLOv3 auto-detect webapi (with [AlexeyAB](https://github.com/AlexeyAB/darknet)'s YOLOv3 `yolo_cpp_dll.dll` which written in 2019, the fastest YOLO on RTX20 series graphics cards, 30+ fps)
 
+    [https://www.youtube.com/watch?v=ajZxjAxAqNk](https://www.youtube.com/watch?v=ajZxjAxAqNk)
+
     shortcut key⌨: Q
 
     - webapi : http://localhost:50505/api/YOLOv3/detect/${image_path} , only accept local image path
@@ -42,7 +44,7 @@
 - feat: Highlight the region on mouse enter each row in yolo detection dialog
 - fix: Remove the last toast immediately, and show the next toast with result smoothly, avoid occluding the main UI
 
-![image](https://github.com/12343954/VoTT/assets/1804003/1144b9a5-490b-4939-a0f9-d5e21a43856f)
+![https://www.youtube.com/watch?v=ajZxjAxAqNk](https://github.com/12343954/VoTT/assets/1804003/1144b9a5-490b-4939-a0f9-d5e21a43856f)
 
 <br /><hr /><br />
 
