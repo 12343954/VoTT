@@ -363,6 +363,7 @@ export enum AssetType {
  * @member Tagged - Specifies an asset has been visited and tagged
  */
 export enum AssetState {
+    None = -1,  // smith added 2024-4-8
     NotVisited = 0,
     Visited = 1,
     Tagged = 2,

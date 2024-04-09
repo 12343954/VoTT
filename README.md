@@ -31,6 +31,7 @@
             detect: [{
                 id, // detection index
                 x,y,w,h,
+                center: "100, 100",
                 obj_id, obj_name, prob, // max prob
                 obj_IDs: [ // the same region, order by prob desc
                     {obj_id, obj_name, prob},

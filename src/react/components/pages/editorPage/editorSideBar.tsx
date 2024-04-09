@@ -17,6 +17,11 @@ export interface IEditorSideBarProps {
     onBeforeAssetSelected?: () => boolean;
     selectedAsset?: IAsset;
     thumbnailSize?: ISize;
+
+    // callback to parent node, smith added 2024-4-8
+    onSidebarChangeSearchWord?: (words: string) => void;
+    // callback to parent node, smith added 2024-4-8
+    onSidebarChangeAsstesState?: (state: AssetState) => void;
 }
 
 /**
@@ -25,6 +30,9 @@ export interface IEditorSideBarProps {
  */
 export interface IEditorSideBarState {
     scrollToIndex: number;
+    search?: string;
+    assetsState?: AssetState;
+    assets: IAsset[],
 }
 
 /**
@@ -32,10 +40,14 @@ export interface IEditorSideBarState {
  * @description - Side bar for editor page
  */
 export default class EditorSideBar extends React.Component<IEditorSideBarProps, IEditorSideBarState> {
+
     public state: IEditorSideBarState = {
         scrollToIndex: this.props.selectedAsset
             ? this.props.assets.findIndex((asset) => asset.id === this.props.selectedAsset.id)
             : 0,
+        search: '',
+        assetsState: AssetState.None,
+        assets: [],
     };
 
     private listRef: React.RefObject<List> = React.createRef();
@@ -43,14 +55,28 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
     public render() {
         return (
             <div className="editor-page-sidebar-nav">
+                <div className="editor-page-content-main-header">
+                    <div className="btn-toolbar" role="toolbar" style={{ margin: '10px' }}>
+                        <input type="search" style={{ flex: 1, minWidth: 0, backgroundColor: 'black', color: 'white', border: '1px solid black', paddingLeft: '4px' }}
+                            maxLength={50}
+                            onChange={(event) => this.onChangeSearch(event)} />
+                        <button type="button"
+                            className={`toolbar-btn ${this.state.assetsState == AssetState.Visited ? 'active' : ''}`}
+                            title="Visited"
+                            onClick={(event: any) => this.showAssetsWithState(event)}>
+                            <i className="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
                 <AutoSizer>
                     {({ height, width }) => (
                         <List
                             ref={this.listRef}
                             className="asset-list"
-                            height={height}
+                            height={height - 78}
                             width={width}
                             rowCount={this.props.assets.length}
+                            // rowCount={this.state.assets.length}
                             rowHeight={() => this.getRowHeight(width)}
                             rowRenderer={this.rowRenderer}
                             overscanRowCount={2}
@@ -75,6 +101,31 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
             prevProps.selectedAsset.id !== this.props.selectedAsset.id) {
             this.selectAsset(this.props.selectedAsset);
         }
+    }
+
+    // callback to parent node, smith added 2024-4-8
+    private showAssetsWithState = async (event: any) => {
+        const { assetsState: assetState } = this.state;
+        switch (assetState) {
+            case AssetState.None:
+                await this.setState({ assetsState: AssetState.Visited })
+                break;
+            case AssetState.Visited:
+                await this.setState({ assetsState: AssetState.None })
+                break;
+        }
+
+        if (this.props.onSidebarChangeAsstesState)
+            this.props.onSidebarChangeAsstesState(this.state.assetsState)
+    }
+
+    // callback to parent node, smith added 2024-4-8
+    private onChangeSearch = async (event: any) => {
+
+        await this.setState({ search: event.target.value })
+
+        if (this.props.onSidebarChangeSearchWord)
+            this.props.onSidebarChangeSearchWord(this.state.search);
     }
 
     private getRowHeight = (width: number) => {
@@ -104,6 +155,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
 
     private rowRenderer = ({ key, index, style }): JSX.Element => {
         const asset = this.props.assets[index];
+        // const asset = this.state.assets[index];
         const selectedAsset = this.props.selectedAsset;
 
         return (
@@ -111,6 +163,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 className={this.getAssetCssClassNames(asset, selectedAsset)}
                 onClick={() => this.onAssetClicked(asset)}>
                 <div className="asset-item-image">
+                    <span className="badge index">{index + 1}</span>
                     {this.renderBadges(asset)}
                     <AssetPreview asset={asset} />
                 </div>

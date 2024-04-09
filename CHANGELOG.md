@@ -1,4 +1,10 @@
 # VoTT Changelog
+# [2.2.3](https://github.com/12343954/VoTT/compare/v2.2.2...v2.2.3) (2024-04-08)
+- feat: Side bar
+    - Add a search box
+    - Add a button for untagged images
+    - Add serial number to list
+
 # [2.2.2](https://github.com/12343954/VoTT/compare/v2.1.0...v2.2.2) (2024-04-07)
 [GitHub Release](https://github.com/12343954/VoTT/releases/tag/v2.2.2)
 

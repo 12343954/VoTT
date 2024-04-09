@@ -82,6 +82,10 @@ export interface IEditorPageState {
     isValid: boolean;
     /** Whether the show invalid region warning alert should display */
     showInvalidRegionWarning: boolean;
+    /*search word from sidebar, smit added 2020-4-8*/
+    searchWord: string;
+    /*Assets state from sidebar, smit added 2020-4-8*/
+    assetsState: AssetState;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -119,6 +123,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         thumbnailSize: this.props.appSettings.thumbnailSize || { width: 175, height: 155 },
         isValid: true,
         showInvalidRegionWarning: false,
+        searchWord: '',
+        assetsState: AssetState.None,
     };
 
     private activeLearningService: ActiveLearningService = null;
@@ -130,6 +136,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     //smith add 2024-4-2
     private yolov3Service: Yolov3Service = null;
+    //smith add 2024-4-8
+    private totalAssets: IAsset[] = [];
 
     public async componentDidMount() {
         const projectId = this.props.match.params["projectId"];
@@ -169,7 +177,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     public render() {
         const { project } = this.props;
         const { assets, selectedAsset } = this.state;
-        const rootAssets = assets.filter((asset) => !asset.parent);
+        const rootAssets = assets.filter((asset) => !asset.parent)
 
         if (!project) {
             return (<div>Loading...</div>);
@@ -209,6 +217,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             onBeforeAssetSelected={this.onBeforeAssetSelected}
                             onAssetSelected={this.selectAsset}
                             thumbnailSize={this.state.thumbnailSize}
+                            onSidebarChangeSearchWord={this.onChangeSearchWordFromSidebar}
+                            onSidebarChangeAsstesState={this.onChangeAsstesStateFromSidebar}
                         />
                     </div>
                     <div className="editor-page-content" onClick={this.onPageClick}>
@@ -277,6 +287,75 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             </div>
         );
     }
+
+    // smith added 2024-4-8
+    private onChangeSearchWordFromSidebar = async (word: string) => {
+
+        await this.setState({ searchWord: word });
+
+        if (this.state.searchWord) {
+            switch (this.state.assetsState) {
+                case AssetState.None:
+                    this.setState({
+                        assets: this.totalAssets.filter(p => p.name.includes(this.state.searchWord))
+                    })
+                    break;
+                case AssetState.Visited:
+                    this.setState({
+                        assets: this.totalAssets.filter(p => p.state == AssetState.Visited
+                                                          && p.name.includes(this.state.searchWord))
+                    })
+                    break;
+            }
+        } else {
+            switch (this.state.assetsState) {
+                case AssetState.None:
+                    this.setState({
+                        assets: this.totalAssets
+                    })
+                    break;
+                case AssetState.Visited:
+                    this.setState({
+                        assets: this.totalAssets.filter(p => p.state == AssetState.Visited)
+                    })
+                    break;
+            }
+        }
+    }
+
+    // smith added 2024-4-8
+    private onChangeAsstesStateFromSidebar = async (state: AssetState) => {
+
+        await this.setState({ assetsState: state })
+
+        switch (this.state.assetsState) {
+            case AssetState.None:
+                if (this.state.searchWord) {
+                    this.setState({
+                        assets: this.totalAssets.filter(p => p.name.includes(this.state.searchWord))
+                    })
+                    break;
+                } else {
+                    this.setState({
+                        assets: this.totalAssets
+                    })
+                }
+                break;
+            case AssetState.Visited:
+                if (this.state.searchWord) {
+                    this.setState({
+                        assets: this.totalAssets.filter(p => p.state == AssetState.Visited
+                                                          && p.name.includes(this.state.searchWord))
+                    })
+                } else {
+                    this.setState({
+                        assets: this.totalAssets.filter(p => p.state == AssetState.Visited)
+                    })
+                }
+                break;
+        }
+    }
+
 
     private onPageClick = () => {
         this.setState({
@@ -819,6 +898,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
 
+        this.totalAssets = rootAssets;
         this.setState({
             assets: rootAssets,
         }, async () => {
