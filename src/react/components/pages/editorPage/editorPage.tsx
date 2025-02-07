@@ -290,6 +290,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     // smith added 2024-4-8
     private onChangeSearchWordFromSidebar = async (word: string) => {
+        console.log(word)
 
         await this.setState({ searchWord: word });
 

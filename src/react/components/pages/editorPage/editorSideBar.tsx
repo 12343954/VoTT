@@ -105,15 +105,10 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
 
     // callback to parent node, smith added 2024-4-8
     private showAssetsWithState = async (event: any) => {
-        const { assetsState: assetState } = this.state;
-        switch (assetState) {
-            case AssetState.None:
-                await this.setState({ assetsState: AssetState.Visited })
-                break;
-            case AssetState.Visited:
-                await this.setState({ assetsState: AssetState.None })
-                break;
-        }
+        if (this.state.assetsState == AssetState.None)
+            await this.setState({ assetsState: AssetState.Visited })
+        else if (this.state.assetsState == AssetState.Visited)
+            await this.setState({ assetsState: AssetState.None })
 
         if (this.props.onSidebarChangeAsstesState)
             this.props.onSidebarChangeAsstesState(this.state.assetsState)
@@ -121,7 +116,6 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
 
     // callback to parent node, smith added 2024-4-8
     private onChangeSearch = async (event: any) => {
-
         await this.setState({ search: event.target.value })
 
         if (this.props.onSidebarChangeSearchWord)

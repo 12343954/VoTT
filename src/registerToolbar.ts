@@ -78,16 +78,6 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
-    //smith add 2024-4-2
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.YoloDetect,
-        tooltip: strings.editorPage.toolbar.yoloDetect,
-        icon: "far fa-eye",
-        group: ToolbarItemGroup.YOLO,
-        type: ToolbarItemType.State,
-        accelerators: ["Q", "q"],
-    });
-
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRegions,
         tooltip: strings.editorPage.toolbar.copy,
@@ -140,6 +130,16 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
         accelerators: ["ArrowDown", "S", "s"],
+    });
+
+    //smith add 2024-4-2
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.YoloDetect,
+        tooltip: strings.editorPage.toolbar.yoloDetect,
+        icon: "far fa-eye",
+        group: ToolbarItemGroup.YOLO,
+        type: ToolbarItemType.State,
+        accelerators: ["Q", "q"],
     });
 
     ToolbarItemFactory.register({
