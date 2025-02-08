@@ -41,8 +41,8 @@ export class AppSettingsForm extends React.Component<IAppSettingsFormProps, IApp
         this.state = {
             formSchema: { ...formSchema },
             uiSchema: { ...uiSchema },
-            appSettings: { ...this.props.appSettings },
             classNames: ["needs-validation"],
+            appSettings: { ...this.props.appSettings },
         };
 
         this.onFormValidate = this.onFormValidate.bind(this);

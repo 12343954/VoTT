@@ -46,6 +46,30 @@ export const chinese: IAppStrings = {
             deleteSuccess: "已成功删除${project.name}", // Successfully deleted ${project.name}
         },
     },
+    user: {
+        title: "仪表板",
+        button: {
+            login: "登录",
+            logout: "退出",
+            switch: "切换用户",
+        },
+        account: "User Account",
+        name: "Nick Name",
+        password: "Password",
+        repassword: "Repassword",
+        login: {
+            success: "Login successful, welcome!",
+            failure: "Login failed, please try again!"
+        },
+        logout: {
+            success: "Log out successful, goodbye!",
+            failure: "Log out failed, please try again!"
+        },
+        save: {
+            success: "User information saved successfully!",
+            failure: "Failed to save user information!",
+        }
+    },
     appSettings: {
         title: "应用程序设置", // Application Settings
         storageTitle: "储存设置", // Storage Settings

@@ -46,6 +46,30 @@ export const korean: IAppStrings = {
             deleteSuccess: "${project.name}을 삭제했습니다",  // Successfully deleted ${project.name}"
         },
     },
+    user: {
+        title: "Dashboard",
+        button: {
+            login: "SIGN IN",
+            logout: "SIGN OUT",
+            switch: "Switch User",
+        },
+        account: "User Account",
+        name: "Nick Name",
+        password: "Password",
+        repassword: "Repassword",
+        login: {
+            success: "Login successful, welcome!",
+            failure: "Login failed, please try again!"
+        },
+        logout: {
+            success: "Log out successful, goodbye!",
+            failure: "Log out failed, please try again!"
+        },
+        save: {
+            success: "User information saved successfully!",
+            failure: "Failed to save user information!",
+        }
+    },
     appSettings: {
         title: "애플리케이션 설정", // Application Settings,
         storageTitle: "저장소 설정", // Storage Settings,

@@ -8,6 +8,7 @@ import { IApplicationState } from "../../models/applicationState";
  * @member currentProject - Current project
  */
 const initialState: IApplicationState = {
+    user: null,
     appSettings: {
         devToolsEnabled: false,
         securityTokens: [],

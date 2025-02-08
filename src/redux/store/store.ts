@@ -13,14 +13,15 @@ import { Env } from "../../common/environment";
  */
 export default function createReduxStore(
     initialState?: IApplicationState,
-    useLocalStorage: boolean = false): Store {
-    const paths: string[] = ["appSettings", "connections", "recentProjects"];
+    useLocalStorage: boolean = false
+): Store {
+    const paths: string[] = ["user", "appSettings", "connections", "recentProjects"];
 
     let middlewares = [thunk, createAppInsightsLogger()];
 
     if (useLocalStorage) {
         const localStorage = require("../middleware/localStorage");
-        const storage = localStorage.createLocalStorage({paths});
+        const storage = localStorage.createLocalStorage({ paths });
         middlewares = [
             ...middlewares,
             storage,

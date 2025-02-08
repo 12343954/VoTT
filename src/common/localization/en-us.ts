@@ -45,6 +45,30 @@ export const english: IAppStrings = {
             deleteSuccess: "Successfully deleted ${project.name}",
         },
     },
+    user: {
+        title: "Dashboard",
+        button: {
+            login: "SIGN IN",
+            logout: "SIGN OUT",
+            switch: "Switch User",
+        },
+        account: "User Account",
+        name: "Nick Name",
+        password: "Password",
+        repassword: "Repassword",
+        login: {
+            success: "Login successful, welcome!",
+            failure: "Login failed, please try again!"
+        },
+        logout: {
+            success: "Log out successful, goodbye!",
+            failure: "Log out failed, please try again!"
+        },
+        save: {
+            success: "User information saved successfully!",
+            failure: "Failed to save user information!",
+        }
+    },
     appSettings: {
         title: "Application Settings",
         storageTitle: "Storage Settings",

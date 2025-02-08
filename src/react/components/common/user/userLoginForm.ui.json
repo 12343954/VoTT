@@ -1,0 +1,8 @@
+{
+    "account": {
+        "ui:autofocus": true
+    },
+    "password": {
+        "ui:widget": "password"
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "required": [
+        "account"
+    ],
+    "properties": {
+        "account": {
+            "type": "string",
+            "title": "${strings.user.account}",
+            "maxLength": 40,
+            "minLength": 4
+        },
+        "password": {
+            "type": "string",
+            "title": "${strings.user.password}",
+            "maxLength": 50
+        }
+    }
+}

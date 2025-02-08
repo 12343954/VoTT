@@ -51,6 +51,30 @@ export interface IAppStrings {
             deleteSuccess: string,
         },
     };
+    user: {
+        title: string;
+        button: {
+            login: string;
+            logout: string;
+            switch: string;
+        };
+        account: string;
+        name: string;
+        password: string;
+        repassword: string;
+        login: {
+            success: string;
+            failure: string;
+        };
+        logout: {
+            success: string;
+            failure: string;
+        };
+        save: {
+            success: string;
+            failure: string;
+        }
+    };
     appSettings: {
         title: string;
         storageTitle: string;

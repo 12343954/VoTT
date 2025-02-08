@@ -18,7 +18,6 @@ export interface RotatedRect {
     Center: point2f,
     Size: size2f,
     Angle: number,
-
 }
 
 export interface obj_box {

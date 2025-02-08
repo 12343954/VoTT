@@ -1,8 +1,9 @@
 import { Action } from "redux";
-import { IToggleDevToolsAction,
-         IRefreshApplicationAction,
-         ISaveAppSettingsAction,
-         IEnsureSecurityTokenAction,
+import {
+    IToggleDevToolsAction,
+    IRefreshApplicationAction,
+    ISaveAppSettingsAction,
+    IEnsureSecurityTokenAction,
 } from "./applicationActions";
 import { ActionTypes } from "./actionTypes";
 import {
@@ -24,6 +25,8 @@ import {
     IShowAppErrorAction,
     IClearErrorAction,
 } from "./appErrorActions";
+
+import { IUpdateUserInfoAction, IUserLogoutAction, IGetUserInfoAction } from "./userActions";
 
 /**
  * Data payload dispatched from the action and delivered to reducer
@@ -87,4 +90,7 @@ export type AnyAction = IOtherAction |
     ILoadAssetMetadataAction |
     IExportProjectAction |
     IShowAppErrorAction |
-    IClearErrorAction;
+    IClearErrorAction |
+    IUpdateUserInfoAction |
+    IUserLogoutAction |
+    IGetUserInfoAction;

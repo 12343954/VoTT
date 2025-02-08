@@ -56,6 +56,8 @@ export default function Sidebar({ project }) {
             </ul>
             <div className="app-sidebar-fill"></div>
             <ul>
+                <li><NavLink title={strings.user.title}
+                    to={`/user`}><i className="fas fa-user"></i></NavLink></li>
                 <li><NavLink title={strings.appSettings.title}
                     to={`/settings`}><i className="fas fa-cog"></i></NavLink></li>
             </ul>

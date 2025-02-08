@@ -46,6 +46,30 @@ export const japanese: IAppStrings = {
             deleteSuccess: "${project.name} を削除しました",  // Successfully deleted ${project.name}"
         },
     },
+    user: {
+        title: "Dashboard",
+        button: {
+            login: "SIGN IN",
+            logout: "SIGN OUT",
+            switch: "Switch User",
+        },
+        account: "User Account",
+        name: "Nick Name",
+        password: "Password",
+        repassword: "Repassword",
+        login: {
+            success: "Login successful, welcome!",
+            failure: "Login failed, please try again!"
+        },
+        logout: {
+            success: "Log out successful, goodbye!",
+            failure: "Log out failed, please try again!"
+        },
+        save: {
+            success: "User information saved successfully!",
+            failure: "Failed to save user information!",
+        }
+    },
     appSettings: {
         title: "アプリケーション設定", // Application Settings,
         storageTitle: "ストレージ設定", // Storage Settings,

@@ -32,7 +32,7 @@ function createWindow() {
 
     mainWindow = new BrowserWindow(windowOptions);
     mainWindow.loadURL(staticUrl);
-    mainWindow.maximize();
+    // mainWindow.maximize();
 
     // Emitted when the window is closed.
     mainWindow.on("closed", () => {

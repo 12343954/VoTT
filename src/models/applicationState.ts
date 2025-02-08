@@ -4,6 +4,7 @@ import { IAssetPreviewSettings } from "../react/components/common/assetPreview/a
 /**
  * @name - Application State
  * @description - Defines the root level application state
+ * @member user - Current user
  * @member appSettings - Application wide settings
  * @member connections - Global list of connections available to application
  * @member recentProjects - List of recently used projects
@@ -11,6 +12,7 @@ import { IAssetPreviewSettings } from "../react/components/common/assetPreview/a
  * @member appError - error in the app if any
  */
 export interface IApplicationState {
+    user?: IUser;
     appSettings: IAppSettings;
     connections: IConnection[];
     recentProjects: IProject[];
@@ -89,6 +91,14 @@ export interface IAppSettings {
     thumbnailSize?: ISize;
 }
 
+export interface IUser {
+    id?: string;
+    account: string;
+    name?: string;
+    password?: string;
+    accessToken?: string;
+}
+
 /**
  * @name - Project
  * @description - Defines the structure of a VoTT project
@@ -102,6 +112,7 @@ export interface IAppSettings {
  * @member exportFormat - Full export format definition
  * @member assets - Map of assets within a project
  * @member autoSave - Whether or not the project will automatically save updates to the underlying target
+ * @member autoDetectApi - yolo restful api url: `http://localhost:50505/api/YOLOv3/detect/${image_path}`
  */
 export interface IProject {
     id: string;
@@ -119,6 +130,7 @@ export interface IProject {
     autoSave: boolean;
     assets?: { [index: string]: IAsset };
     lastVisitedAssetId?: string;
+    autoDetectApi?: string;
 }
 
 /**

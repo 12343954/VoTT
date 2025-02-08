@@ -118,16 +118,18 @@ export interface IEnsureSecurityTokenAction extends IPayloadAction<string, IAppS
  * Instance of toggle dev tools action
  */
 export const toggleDevToolsAction = createPayloadAction<IToggleDevToolsAction>(ActionTypes.TOGGLE_DEV_TOOLS_SUCCESS);
+
 /**
  * Instance of refresh app action
  */
 export const refreshApplicationAction = createAction<IRefreshApplicationAction>(ActionTypes.REFRESH_APP_SUCCESS);
+
 /**
  * Instance of save app settings action
  */
 export const saveAppSettingsAction = createPayloadAction<ISaveAppSettingsAction>(ActionTypes.SAVE_APP_SETTINGS_SUCCESS);
+
 /**
  * Instance of Export Project action
  */
-export const ensureSecurityTokenAction =
-    createPayloadAction<IEnsureSecurityTokenAction>(ActionTypes.ENSURE_SECURITY_TOKEN_SUCCESS);
+export const ensureSecurityTokenAction = createPayloadAction<IEnsureSecurityTokenAction>(ActionTypes.ENSURE_SECURITY_TOKEN_SUCCESS);

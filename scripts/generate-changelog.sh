@@ -34,7 +34,7 @@ done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
 
-BASE_GITHUB_URL=https://github.com/Microsoft/VoTT
+BASE_GITHUB_URL=https://github.com/12343954/VoTT
 RELEASE_DATE=$(date +"%m-%d-%Y")
 TEMPLATE="# [${TO_COMMIT}](${BASE_GITHUB_URL}/compare/${FROM_COMMIT}...${TO_COMMIT}) (${RELEASE_DATE})\n[GitHub Release](${BASE_GITHUB_URL}/releases/tag/${TO_COMMIT})\n\n"
 CL_START='<!-- cl-start -->'
