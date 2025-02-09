@@ -105,6 +105,10 @@ export const spanish: IAppStrings = {
     },
     projectSettings: {
         title: "Configuración de Proyecto",
+        autoDetectApi: {
+            title: "Auto-detect Api URL",
+            description: "e.g. http://somedomain.com/api/YOLOv3/detect/"
+        },
         securityToken: {
             title: "Token de seguridad",
             description: "Se utiliza para cifrar datos confidenciales dentro de archivos de proyecto",

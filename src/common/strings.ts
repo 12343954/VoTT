@@ -110,6 +110,10 @@ export interface IAppStrings {
     };
     projectSettings: {
         title: string;
+        autoDetectApi: {
+            title: string;
+            description: string;
+        },
         securityToken: {
             title: string;
             description: string;

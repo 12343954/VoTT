@@ -106,6 +106,10 @@ export const korean: IAppStrings = {
     },
     projectSettings: {
         title: "프로젝트 설정", // Project Settings,
+        autoDetectApi: {
+            title: "Auto-detect Api URL",
+            description: "e.g. http://somedomain.com/api/YOLOv3/detect/"
+        },
         securityToken: {
             title: "보안 토큰",  // Security Token,
             description: "프로젝트 파일 내에서 중요한 데이터를 암호화하는 데 사용",  // Used to encrypt sensitive data within project file

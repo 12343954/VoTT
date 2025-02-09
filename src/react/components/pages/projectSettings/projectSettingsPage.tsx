@@ -5,7 +5,7 @@ import { RouteComponentProps } from "react-router-dom";
 import ProjectForm from "./projectForm";
 import { strings, interpolate } from "../../../../common/strings";
 import IProjectActions, * as projectActions from "../../../../redux/actions/projectActions";
-import { IApplicationState, IProject, IConnection, IAppSettings } from "../../../../models/applicationState";
+import { IApplicationState, IProject, IConnection, IAppSettings, IUser } from "../../../../models/applicationState";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
 import { toast } from "react-toastify";
 import "./projectSettingsPage.scss";
@@ -19,6 +19,7 @@ import ProjectMetrics from "./projectMetrics";
  * @member connections - Array of connections available for projects
  */
 export interface IProjectSettingsPageProps extends RouteComponentProps, React.Props<ProjectSettingsPage> {
+    user?: IUser;
     project: IProject;
     recentProjects: IProject[];
     projectActions: IProjectActions;
@@ -33,6 +34,7 @@ export interface IProjectSettingsPageState {
 
 function mapStateToProps(state: IApplicationState) {
     return {
+        user: state.user,
         project: state.currentProject,
         connections: state.connections,
         recentProjects: state.recentProjects,
@@ -78,6 +80,9 @@ export default class ProjectSettingsPage extends React.Component<IProjectSetting
                 await this.props.projectActions.loadProject(projectToLoad);
             }
         }
+
+        // if(this.props.user) alert(this.props.user.account)
+        // else alert('no user login')
     }
 
     public componentDidUpdate(prevProps: Readonly<IProjectSettingsPageProps>) {

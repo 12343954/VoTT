@@ -16,5 +16,8 @@
     },
     "tags": {
         "ui:field": "tagsInput"
+    },
+    "autoDetectApi": {
+        "ui:widget": "textarea"
     }
 }

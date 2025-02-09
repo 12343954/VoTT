@@ -48,23 +48,13 @@ export interface IUserLoginFormState {
 }
 
 /**
- * @name - Cloud File Picker
- * @description - Modal to choose and read file from cloud connections
+ * @name - User Login Form
+ * @description - Modal dialog to user login
  */
 export default class UserLoginForm extends React.Component<IUserLoginFormProps, IUserLoginFormState> {
     private fields = {
-        // user: {
         account: CustomField(ProtectedInput, (props) => ({})),
-        // name: CustomField(ProtectedInput, (props) => ({})),
         password: CustomField(ProtectedInput, (props) => ({})),
-
-        // securityToken: CustomField(ProtectedInput, (props) => ({
-        //     id: props.idSchema.$id,
-        //     value: props.formData || generateKey(),
-        //     onChange: props.onChange,
-        // })),
-
-        // }
     }
 
     constructor(props) {

@@ -6,6 +6,13 @@
             "type": "string",
             "pattern": "^[^\\\\\\\\/:*?\\\\\\\"<>|]*$"
         },
+        "autoDetectApi": {
+            "type": "string",
+            "title": "${strings.projectSettings.autoDetectApi.title}",
+            "description": "${strings.projectSettings.autoDetectApi.description}",
+            "help": "${strings.projectSettings.autoDetectApi.description}",
+            "pattern": "^(http|https):\/\/"
+        },
         "sourceConnection": {
             "title": "${strings.projectSettings.sourceConnection.title}",
             "description": "${strings.projectSettings.sourceConnection.description}",

@@ -106,6 +106,10 @@ export const japanese: IAppStrings = {
     },
     projectSettings: {
         title: "プロジェクト設定", // Project Settings,
+        autoDetectApi: {
+            title: "Auto-detect Api URL",
+            description: "e.g. http://somedomain.com/api/YOLOv3/detect/"
+        },
         securityToken: {
             title: "セキュリティ トークン",  // Security Token,
             description: "プロジェクト ファイル内の機密データを暗号化するために使用されます",  // Used to encrypt sensitive data within project file"

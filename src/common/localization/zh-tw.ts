@@ -106,6 +106,10 @@ export const chinesetw: IAppStrings = {
     },
     projectSettings: {
         title: "專案設定", // Project Settings
+        autoDetectApi: {
+            title: "Auto-detect Api URL",
+            description: "e.g. http://somedomain.com/api/YOLOv3/detect/"
+        },
         securityToken: {
             title: "安全性權杖", // Security Token
             description: "用於加密專案檔案中的敏感資料", // Used to encrypt sensitive data within project files
