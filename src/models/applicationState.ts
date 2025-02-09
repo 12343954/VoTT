@@ -293,11 +293,16 @@ export interface IAsset {
  * @description - Format to store asset metadata for each asset within a project
  * @member asset - References an asset within the project
  * @member regions - The list of regions drawn on the asset
+ * @member version - vott version
+ * @member creator - who labeled image
+ * @member createdDate - when labeled image
  */
 export interface IAssetMetadata {
     asset: IAsset;
     regions: IRegion[];
     version: string;
+    creator?: string;
+    createdDate?: number;
 }
 
 /**
@@ -318,6 +323,9 @@ export interface ISize {
  * @member type - Defines the type of region
  * @member tags - Defines a list of tags applied to a region
  * @member points - Defines a list of points that define a region
+ * @member boundingBox - bboxes
+ * @member creator - who labeled the region
+ * @member createdDate - when labeled the region
  */
 export interface IRegion {
     id: string;
@@ -325,6 +333,8 @@ export interface IRegion {
     tags: string[];
     points?: IPoint[];
     boundingBox?: IBoundingBox;
+    creator?: string;
+    createdDate?: number;
 }
 
 /**

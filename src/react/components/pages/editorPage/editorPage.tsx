@@ -13,6 +13,7 @@ import {
     IAppSettings, IAsset, IAssetMetadata, IProject, IRegion,
     ISize, ITag, IAdditionalPageSettings, AppError, ErrorCode,
     RegionType,
+    IUser,
 } from "../../../../models/applicationState";
 import { IToolbarItemRegistration, ToolbarItemFactory } from "../../../../providers/toolbar/toolbarItemFactory";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
@@ -44,6 +45,7 @@ import Yolov3Service from '../../../../services/yolov3Service'
  * @member applicationActions - Application setting actions
  */
 export interface IEditorPageProps extends RouteComponentProps, React.Props<EditorPage> {
+    user?: IUser;
     project: IProject;
     recentProjects: IProject[];
     appSettings: IAppSettings;
@@ -90,6 +92,7 @@ export interface IEditorPageState {
 
 function mapStateToProps(state: IApplicationState) {
     return {
+        user: state.user,
         recentProjects: state.recentProjects,
         project: state.currentProject,
         appSettings: state.appSettings,
@@ -150,6 +153,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
         this.yolov3Service = new Yolov3Service();
+
+        // if(this.props.user) alert(this.props.user.account)
+        // else alert('no user login')
     }
 
     public async componentDidUpdate(prevProps: Readonly<IEditorPageProps>) {
@@ -304,7 +310,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 case AssetState.Visited:
                     this.setState({
                         assets: this.totalAssets.filter(p => p.state == AssetState.Visited
-                                                          && p.name.includes(this.state.searchWord))
+                            && p.name.includes(this.state.searchWord))
                     })
                     break;
             }
@@ -346,7 +352,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 if (this.state.searchWord) {
                     this.setState({
                         assets: this.totalAssets.filter(p => p.state == AssetState.Visited
-                                                          && p.name.includes(this.state.searchWord))
+                            && p.name.includes(this.state.searchWord))
                     })
                 } else {
                     this.setState({
@@ -552,6 +558,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
         // Only update asset metadata if state changes or is different
         if (initialState !== assetMetadata.asset.state || this.state.selectedAsset !== assetMetadata) {
+            if (!assetMetadata.creator && this.props.user) assetMetadata.creator = this.props.user.account;
+            if (!assetMetadata.createdDate) assetMetadata.createdDate = new Date().valueOf();
+
             await this.props.actions.saveAssetMetadata(this.props.project, assetMetadata);
         }
 
@@ -586,6 +595,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private onSelectedRegionsChanged = (selectedRegions: IRegion[]) => {
+        if (selectedRegions.length) {
+            selectedRegions = selectedRegions.map(region => {
+                if(region.tags.length == 0) return region;
+
+                if (!region.creator && this.props.user) region.creator = this.props.user.account;
+                if (!region.createdDate) region.createdDate = new Date().valueOf();
+                return region;
+            });
+        }
+        console.log('onSelectedRegionsChanged', selectedRegions)
+
         this.setState({ selectedRegions });
     }
 
@@ -711,7 +731,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 { x: k.x + k.w, y: k.y }, // Top Right
                                 { x: k.x, y: k.y + k.h }, // Bottom Left
                                 { x: k.x + k.w, y: k.y + k.h }, // Bottom Right
-                            ]
+                            ],
+                            creator: this.props.user ? this.props.user.account : "",
+                            createdDate: new Date().valueOf(),
                         }
                     })
                 } else {
@@ -724,16 +746,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             (center.x - 0.5 * (old.boundingBox.left + old.boundingBox.width)),
                             (center.y - 0.5 * (old.boundingBox.top + old.boundingBox.height)),
                         ) < 100)
-                        // console.log('11111111111111111111111')
-                        // debugger;
-                        if (exist.length) {
-                            // console.log('exist', exist)
-                            // console.log('exist.tags', exist.tags)
-                            // console.log('k.obj_IDs.map(p => p.name)', k.obj_IDs.map(p => p.name))
 
-                            return { ...exist, ...{ tags: [...exist.tags, ...k.obj_IDs.map(p => p.name)] } }
+                        if (exist.length) {
+                            return {
+                                ...exist,
+                                ...{
+                                    tags: [...exist.tags, ...k.obj_IDs.map(p => p.name)],
+                                    creator: exist[0].creator || (this.props.user ? this.props.user.account : ""),
+                                    createdDate: exist[0].createdDate || new Date().valueOf(),
+                                }
+                            }
                         } else {
-                            // console.log('2222222222222')
                             return {
                                 id: shortid.generate(),
                                 tags: k.obj_IDs.map(p => p.name),
@@ -744,7 +767,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     { x: k.x + k.w, y: k.y }, // Top Right
                                     { x: k.x, y: k.y + k.h }, // Bottom Left
                                     { x: k.x + k.w, y: k.y + k.h }, // Bottom Right
-                                ]
+                                ],
+                                creator: this.props.user ? this.props.user.account : "",
+                                createdDate: new Date().valueOf(),
                             }
                         }
                     })

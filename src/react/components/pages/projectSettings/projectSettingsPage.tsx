@@ -80,9 +80,6 @@ export default class ProjectSettingsPage extends React.Component<IProjectSetting
                 await this.props.projectActions.loadProject(projectToLoad);
             }
         }
-
-        // if(this.props.user) alert(this.props.user.account)
-        // else alert('no user login')
     }
 
     public componentDidUpdate(prevProps: Readonly<IProjectSettingsPageProps>) {
