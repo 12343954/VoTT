@@ -300,14 +300,14 @@ export const chinese: IAppStrings = {
         tagged: "已标记", // Tagged
         visited: "已访问", // Visited
         toolbar: {
-            select: "选择[V]", // Select (V)
+            selectCanvas: "选择", // Select (V)
             pan: "泛", // Pan
             drawRectangle: "绘制矩形", // Draw Rectangle
             drawPolygon: "绘制多边形", // Draw Polygon
             copyRectangle: "复制矩形", // Copy Rectangle
-            copy: "复制区域", // Copy Regions
-            cut: "剪切区域", // Cut Regions
-            paste: "粘贴区域", // Paste Regions
+            copyRegions: "复制区域", // Copy Regions
+            cutRegions: "剪切区域", // Cut Regions
+            pasteRegions: "粘贴区域", // Paste Regions
             removeAllRegions: "删除所有区域", // Remove All Regions
             previousAsset: "以前的素材", // Previous Asset
             nextAsset: "下一项素材", // Next Asset

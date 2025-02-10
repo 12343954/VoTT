@@ -303,14 +303,14 @@ export const chinesetw: IAppStrings = {
         tagged: "已標記", // Tagged
         visited: "已檢視", // Visited
         toolbar: {
-            select: "選擇 (V)", // Select (V)
+            selectCanvas: "選擇", // Select (V)
             pan: "全景", // Pan
             drawRectangle: "繪製矩形", // Draw Rectangle
             drawPolygon: "繪製多邊形", // Draw Polygon
             copyRectangle: "複製矩形", // Copy Rectangle
-            copy: "複製區域", // Copy Regions
-            cut: "剪下區域", // Cut Regions
-            paste: "貼上區域", // Paste Regions
+            copyRegions: "複製區域", // Copy Regions
+            cutRegions: "剪下區域", // Cut Regions
+            pasteRegions: "貼上區域", // Paste Regions
             removeAllRegions: "刪除所有區域", // Remove All Regions
             previousAsset: "以前的圖像數據", // Previous Asset
             nextAsset: "下一個圖像數據", // Next Asset

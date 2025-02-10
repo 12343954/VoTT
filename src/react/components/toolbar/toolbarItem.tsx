@@ -85,6 +85,7 @@ export abstract class ToolbarItem extends React.Component<IToolbarItemProps> {
                 <button type="button"
                     className={className.join(" ")}
                     title={this.getTitle()}
+                    data-shortcut={this.getShortcut()}
                     onClick={this.onClick}>
                     <i className={"fas " + this.props.icon} />
                 </button>

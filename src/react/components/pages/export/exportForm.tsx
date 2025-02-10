@@ -15,9 +15,9 @@ import { CustomWidget } from "../../common/customField/customField";
 import { Slider } from "../../common/slider/slider";
 
 // tslint:disable-next-line:no-var-requires
-const formSchema = addLocValues(require("./exportForm.json"));
+// const formSchema = addLocValues(require("./exportForm.json"));
 // tslint:disable-next-line:no-var-requires
-const uiSchema = addLocValues(require("./exportForm.ui.json"));
+// const uiSchema = addLocValues(require("./exportForm.ui.json"));
 
 /**
  * Properties for Export Form
@@ -52,11 +52,16 @@ export interface IExportFormState {
  * @description - Form to view/edit settings for exporting of project
  */
 export default class ExportForm extends React.Component<IExportFormProps, IExportFormState> {
+    // tslint:disable-next-line:no-var-requires
+    private formSchema = addLocValues(require("./exportForm.json"));
+    // tslint:disable-next-line:no-var-requires
+    private uiSchema = addLocValues(require("./exportForm.ui.json"));
+
     public state: IExportFormState = {
         classNames: ["needs-validation"],
         providerName: this.props.settings ? this.props.settings.providerType : null,
-        formSchema: { ...formSchema },
-        uiSchema: { ...uiSchema },
+        formSchema: { ...this.formSchema },
+        uiSchema: { ...this.uiSchema },
         formData: this.props.settings,
     };
 
@@ -76,6 +81,13 @@ export default class ExportForm extends React.Component<IExportFormProps, IExpor
         if (this.props.settings) {
             this.bindForm(this.props.settings);
         }
+
+        this.formSchema = addLocValues(require("./exportForm.json"));
+        this.uiSchema = addLocValues(require("./exportForm.ui.json"));
+        this.setState({
+            uiSchema: { ...this.uiSchema },
+            formSchema: { ...this.formSchema },
+        })
     }
 
     public componentDidUpdate(prevProps: IExportFormProps) {
@@ -153,10 +165,10 @@ export default class ExportForm extends React.Component<IExportFormProps, IExpor
             const providerSchema = addLocValues(require(`../../../../providers/export/${providerType}.json`));
             const providerUiSchema = require(`../../../../providers/export/${providerType}.ui.json`);
 
-            newFormSchema = { ...formSchema };
+            newFormSchema = { ...this.formSchema };
             newFormSchema.properties["providerOptions"] = providerSchema;
 
-            newUiSchema = { ...uiSchema };
+            newUiSchema = { ...this.uiSchema };
             newUiSchema["providerOptions"] = providerUiSchema;
         }
 

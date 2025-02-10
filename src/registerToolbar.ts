@@ -13,8 +13,8 @@ export enum ToolbarItemName {
     CutRegions = "cutRegions",
     PasteRegions = "pasteRegions",
     RemoveAllRegions = "removeAllRegions",
-    PreviousAsset = "navigatePreviousAsset",
-    NextAsset = "navigateNextAsset",
+    PreviousAsset = "previousAsset",
+    NextAsset = "nextAsset",
     SaveProject = "saveProject",
     ExportProject = "exportProject",
     ActiveLearning = "activeLearning",
@@ -35,7 +35,7 @@ export enum ToolbarItemGroup {
 export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.SelectCanvas,
-        tooltip: strings.editorPage.toolbar.select,
+        tooltip: strings.editorPage.toolbar.selectCanvas,
         icon: "fa-mouse-pointer",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
@@ -80,7 +80,7 @@ export default function registerToolbar() {
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRegions,
-        tooltip: strings.editorPage.toolbar.copy,
+        tooltip: strings.editorPage.toolbar.copyRegions,
         icon: "fa-copy",
         group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.Action,
@@ -89,7 +89,7 @@ export default function registerToolbar() {
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.CutRegions,
-        tooltip: strings.editorPage.toolbar.cut,
+        tooltip: strings.editorPage.toolbar.cutRegions,
         icon: "fa-cut",
         group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.Action,
@@ -98,7 +98,7 @@ export default function registerToolbar() {
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.PasteRegions,
-        tooltip: strings.editorPage.toolbar.paste,
+        tooltip: strings.editorPage.toolbar.pasteRegions,
         icon: "fa-paste",
         group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.Action,

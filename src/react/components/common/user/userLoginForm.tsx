@@ -11,10 +11,10 @@ import CustomFieldTemplate from "../../common/customField/customFieldTemplate";
 import { ProtectedInput } from "../../common/protectedInput/protectedInput";
 import { CustomField } from "../../common/customField/customField";
 
-// tslint:disable-next-line:no-var-requires
-const formSchema = addLocValues(require("./userLoginForm.json"));
-// tslint:disable-next-line:no-var-requires
-const uiSchema = addLocValues(require("./userLoginForm.ui.json"));
+// // tslint:disable-next-line:no-var-requires
+// const formSchema = addLocValues(require("./userLoginForm.json"));
+// // tslint:disable-next-line:no-var-requires
+// const uiSchema = addLocValues(require("./userLoginForm.ui.json"));
 
 /**
  * Properties for Cloud File Picker
@@ -57,11 +57,25 @@ export default class UserLoginForm extends React.Component<IUserLoginFormProps, 
         password: CustomField(ProtectedInput, (props) => ({})),
     }
 
+    // tslint:disable-next-line:no-var-requires
+    private formSchema = addLocValues(require("./userLoginForm.json"));
+    // tslint:disable-next-line:no-var-requires
+    private uiSchema = addLocValues(require("./userLoginForm.ui.json"));
+
     constructor(props) {
         super(props);
 
         this.state = this.getInitialState();
         this.onFormValidate = this.onFormValidate.bind(this);
+    }
+
+    public componentDidMount(): void {
+        this.formSchema = addLocValues(require("./userLoginForm.json"));
+        this.uiSchema = addLocValues(require("./userLoginForm.ui.json"));
+        this.setState({
+            uiSchema: { ...this.uiSchema },
+            formSchema: { ...this.formSchema },
+        })
     }
 
     public render() {
@@ -104,8 +118,8 @@ export default class UserLoginForm extends React.Component<IUserLoginFormProps, 
     private getInitialState(): IUserLoginFormState {
         return {
             isOpen: false,
-            formSchema: { ...formSchema },
-            uiSchema: { ...uiSchema },
+            formSchema: { ...this.formSchema },
+            uiSchema: { ...this.uiSchema },
             classNames: ["needs-validation"],
         };
     }

@@ -296,14 +296,14 @@ export interface IAppStrings {
         tagged: string;
         visited: string;
         toolbar: {
-            select: string;
+            selectCanvas: string;
             pan: string;
             drawRectangle: string;
             drawPolygon: string;
             copyRectangle: string;
-            copy: string;
-            cut: string;
-            paste: string;
+            copyRegions: string;
+            cutRegions: string;
+            pasteRegions: string;
             removeAllRegions: string;
             previousAsset: string;
             nextAsset: string;

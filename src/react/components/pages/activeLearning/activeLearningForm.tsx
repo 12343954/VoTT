@@ -8,9 +8,9 @@ import { CustomWidget } from "../../common/customField/customField";
 import Checkbox from "rc-checkbox";
 
 // tslint:disable-next-line:no-var-requires
-const formSchema = addLocValues(require("./activeLearningForm.json"));
+// const formSchema = addLocValues(require("./activeLearningForm.json"));
 // tslint:disable-next-line:no-var-requires
-const uiSchema = addLocValues(require("./activeLearningForm.ui.json"));
+// const uiSchema = addLocValues(require("./activeLearningForm.ui.json"));
 
 export interface IActiveLearningFormProps extends React.Props<ActiveLearningForm> {
     settings: IActiveLearningSettings;
@@ -27,10 +27,16 @@ export interface IActiveLearningFormState {
 }
 
 export class ActiveLearningForm extends React.Component<IActiveLearningFormProps, IActiveLearningFormState> {
+
+    // tslint:disable-next-line:no-var-requires
+    private formSchema = addLocValues(require("./activeLearningForm.json"));
+    // tslint:disable-next-line:no-var-requires
+    private uiSchema = addLocValues(require("./activeLearningForm.ui.json"));
+
     public state: IActiveLearningFormState = {
         classNames: ["needs-validation"],
-        uiSchema: { ...uiSchema },
-        formSchema: { ...formSchema },
+        uiSchema: { ...this.uiSchema },
+        formSchema: { ...this.formSchema },
         formData: {
             ...this.props.settings,
         },
@@ -44,6 +50,15 @@ export class ActiveLearningForm extends React.Component<IActiveLearningFormProps
             disabled: props.disabled,
         })),
     };
+
+    public componentDidMount(): void {
+        this.formSchema = addLocValues(require("./activeLearningForm.json"));
+        this.uiSchema = addLocValues(require("./activeLearningForm.ui.json"));
+        this.setState({
+            uiSchema: { ...this.uiSchema },
+            formSchema: { ...this.formSchema },
+        })
+    }
 
     public componentDidUpdate(prevProps: Readonly<IActiveLearningFormProps>) {
         if (this.props.settings !== prevProps.settings) {

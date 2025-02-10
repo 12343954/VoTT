@@ -1,4 +1,5 @@
 import { IAppSettings, IApplicationState } from "../../models/applicationState";
+import { strings } from "../../common/strings";
 
 const appSettings: IAppSettings = JSON.parse(localStorage.getItem('appSettings'));
 
@@ -23,6 +24,9 @@ const initialState: IApplicationState = {
     currentProject: null,
     appError: null,
 };
+
+strings.setLanguage(initialState.appSettings.language);
+
 
 /**
  * Instance of initial application state

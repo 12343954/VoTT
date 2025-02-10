@@ -143,6 +143,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private totalAssets: IAsset[] = [];
 
     public async componentDidMount() {
+        this.refreshToolbars();
+
         const projectId = this.props.match.params["projectId"];
         if (this.props.project) {
             await this.loadProjectAssets();
@@ -155,7 +157,24 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.yolov3Service = new Yolov3Service(this.props.project.autoDetectApi ? this.props.project.autoDetectApi : "");
     }
 
+    private refreshToolbars() {
+        setTimeout(() => {
+            Object.keys(strings.editorPage.toolbar).forEach(p => {
+                const selector = `.editor-page-content-main-header .toolbar-btn.${p}`;
+                let item: HTMLElement = document.querySelector(selector)
+                if (item) {
+                    item.setAttribute("title", `${strings.editorPage.toolbar[p]}${item.getAttribute("data-shortcut")}`)
+                }
+            })
+        }, 1000)
+    }
+
     public async componentDidUpdate(prevProps: Readonly<IEditorPageProps>) {
+        // if (prevProps.appSettings !== this.props.appSettings) {
+        //     console.log("appSettings changed")
+        //     this.toolbarItems = ToolbarItemFactory.getToolbarItems();
+        // }
+
         if (this.props.project && this.state.assets.length === 0) {
             await this.loadProjectAssets();
         }

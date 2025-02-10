@@ -13,10 +13,10 @@ import Checkbox from "rc-checkbox";
 import { IConnectionProviderPickerProps } from "../../common/connectionProviderPicker/connectionProviderPicker";
 import LocalFolderPicker from "../../common/localFolderPicker/localFolderPicker";
 
-// tslint:disable-next-line:no-var-requires
-const formSchema = addLocValues(require("./projectForm.json"));
-// tslint:disable-next-line:no-var-requires
-const uiSchema = addLocValues(require("./projectForm.ui.json"));
+// // tslint:disable-next-line:no-var-requires
+// const formSchema = addLocValues(require("./projectForm.json"));
+// // tslint:disable-next-line:no-var-requires
+// const uiSchema = addLocValues(require("./projectForm.ui.json"));
 
 /**
  * Required properties for Project Settings form
@@ -65,12 +65,17 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
     private tagsInput: React.RefObject<TagsInput>;
     private tagEditorModal: React.RefObject<TagEditorModal>;
 
+    // tslint:disable-next-line:no-var-requires
+    private formSchema = addLocValues(require("./projectForm.json"));
+    // tslint:disable-next-line:no-var-requires
+    private uiSchema = addLocValues(require("./projectForm.ui.json"));
+
     constructor(props, context) {
         super(props, context);
         this.state = {
             classNames: ["needs-validation"],
-            uiSchema: { ...uiSchema },
-            formSchema: { ...formSchema },
+            uiSchema: { ...this.uiSchema },
+            formSchema: { ...this.formSchema },
             formData: {
                 ...this.props.project,
             },
@@ -84,6 +89,16 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         this.onTagShiftClick = this.onTagShiftClick.bind(this);
         this.onTagModalOk = this.onTagModalOk.bind(this);
     }
+
+    public componentDidMount(): void {
+        this.formSchema = addLocValues(require("./projectForm.json"));
+        this.uiSchema = addLocValues(require("./projectForm.ui.json"));
+        this.setState({
+            uiSchema: { ...this.uiSchema },
+            formSchema: { ...this.formSchema },
+        })
+    }
+
     /**
      * Updates state if project from properties has changed
      * @param prevProps - previously set properties

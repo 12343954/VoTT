@@ -14,16 +14,14 @@ import registerProviders from "./registerProviders";
 import registerMixins from "./registerMixins";
 
 import { setUpAppInsights } from "./telemetry";
-import { strings } from "./common/strings";
+
+const defaultState: IApplicationState = initialState; // setting language first in initialState
+const store = createReduxStore(defaultState, true);
 
 setUpAppInsights();
 
 registerMixins();
 registerProviders();
-
-const defaultState: IApplicationState = initialState;
-strings.setLanguage(defaultState.appSettings.language);
-const store = createReduxStore(defaultState, true);
 
 ReactDOM.render(
     <Provider store={store}>

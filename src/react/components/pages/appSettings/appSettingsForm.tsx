@@ -8,10 +8,11 @@ import { IAppSettings } from "../../../../models/applicationState";
 import { ProtectedInput } from "../../common/protectedInput/protectedInput";
 import { CustomField } from "../../common/customField/customField";
 import { generateKey } from "../../../../common/crypto";
-// tslint:disable-next-line:no-var-requires
-const formSchema = addLocValues(require("./appSettingsForm.json"));
-// tslint:disable-next-line:no-var-requires
-const uiSchema = addLocValues(require("./appSettingsForm.ui.json"));
+
+// // tslint:disable-next-line:no-var-requires
+// const formSchema = addLocValues(require("./appSettingsForm.json"));
+// // tslint:disable-next-line:no-var-requires
+// const uiSchema = addLocValues(require("./appSettingsForm.ui.json"));
 
 export interface IAppSettingsFormProps extends React.Props<AppSettingsForm> {
     appSettings: IAppSettings;
@@ -35,12 +36,17 @@ export class AppSettingsForm extends React.Component<IAppSettingsFormProps, IApp
         })),
     };
 
+    // tslint:disable-next-line:no-var-requires
+    private formSchema = addLocValues(require("./appSettingsForm.json"));
+    // tslint:disable-next-line:no-var-requires
+    private uiSchema = addLocValues(require("./appSettingsForm.ui.json"));
+
     constructor(props: IAppSettingsFormProps) {
         super(props);
 
         this.state = {
-            formSchema: { ...formSchema },
-            uiSchema: { ...uiSchema },
+            formSchema: { ...this.formSchema },
+            uiSchema: { ...this.uiSchema },
             classNames: ["needs-validation"],
             appSettings: { ...this.props.appSettings },
         };
@@ -49,10 +55,26 @@ export class AppSettingsForm extends React.Component<IAppSettingsFormProps, IApp
         this.onFormCancel = this.onFormCancel.bind(this);
     }
 
+    public componentDidMount(): void {
+
+    }
+
+    private reloadShema = () => {
+        this.formSchema = addLocValues(require("./appSettingsForm.json"));
+        this.uiSchema = addLocValues(require("./appSettingsForm.ui.json"));
+        // this.setState({
+        //     uiSchema: { ...this.uiSchema },
+        //     formSchema: { ...this.formSchema },
+        // })
+    }
+
     public componentDidUpdate(prevProps: IAppSettingsFormProps) {
         if (prevProps.appSettings !== this.props.appSettings) {
+            this.reloadShema();
             this.setState({
                 appSettings: { ...this.props.appSettings },
+                formSchema: { ...this.formSchema },
+                uiSchema: { ...this.uiSchema },
             });
         }
     }
