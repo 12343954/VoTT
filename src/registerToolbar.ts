@@ -136,7 +136,7 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.YoloDetect,
         tooltip: strings.editorPage.toolbar.yoloDetect,
-        icon: "far fa-eye",
+        icon: "fa-icon-ai",
         group: ToolbarItemGroup.YOLO,
         type: ToolbarItemType.State,
         accelerators: ["Q", "q"],

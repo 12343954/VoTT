@@ -56,3 +56,15 @@ $darker-15: rgba(0,0,0,0.75);
 .bg-lighter-5 {
     background-color: $lighter-5;
 }
+
+.fa-icon-ai{
+    background-image: url('data:image/svg+xml;charset=utf-8;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8dGV4dCBzdHlsZT0iLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiAjZThlNmUzOyAtLWRhcmtyZWFkZXItaW5saW5lLXN0cm9rZTogI2IzMDA1OTsiIHRyYW5zZm9ybT0ibWF0cml4KDMuMjkwMTggMCAwIDIuODUyMDUgLTM5LjY0MjcgLTYxLjM4ODkpIiBzdHJva2U9IiNmZjAwN2YiIHhtbDpzcGFjZT0icHJlc2VydmUiIHRleHQtYW5jaG9yPSJzdGFydCIgZm9udC1mYW1pbHk9IidBbmRhZGEgUHJvJyIgZm9udC1zaXplPSIyNCIgaWQ9InN2Z18xIiB5PSI1Mi4xMjQyIiB4PSIxNy4zNDA1OSIgc3Ryb2tlLXdpZHRoPSIwIiBmaWxsPSIjQ0NDIj5BSTwvdGV4dD4KIDwvZz4KPC9zdmc+Cg==');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 32px;
+    height: 40px;
+    display: block;
+    margin: 0;
+    padding: 0;
+}

@@ -152,10 +152,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
-        this.yolov3Service = new Yolov3Service();
-
-        // if(this.props.user) alert(this.props.user.account)
-        // else alert('no user login')
+        this.yolov3Service = new Yolov3Service(this.props.project.autoDetectApi ? this.props.project.autoDetectApi : "");
     }
 
     public async componentDidUpdate(prevProps: Readonly<IEditorPageProps>) {
@@ -597,14 +594,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private onSelectedRegionsChanged = (selectedRegions: IRegion[]) => {
         if (selectedRegions.length) {
             selectedRegions = selectedRegions.map(region => {
-                if(region.tags.length == 0) return region;
+                if (region.tags.length == 0) return region;
 
                 if (!region.creator && this.props.user) region.creator = this.props.user.account;
                 if (!region.createdDate) region.createdDate = new Date().valueOf();
                 return region;
             });
         }
-        console.log('onSelectedRegionsChanged', selectedRegions)
 
         this.setState({ selectedRegions });
     }
@@ -780,15 +776,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         regions: new_regions,
                         asset: {
                             ...this.state.selectedAsset.asset,
-                            state: AssetState.Tagged
                         }
                     }
+                }, () => {
+                    // save assetMeta data to json file...
+                    this.onAssetMetadataChanged(this.state.selectedAsset);
                 })
             } else {
-                toast.error(result.message || "YOLOv3 auto-detect error!")
+                toast.error(result.message || "YOLOv3 auto-detect function error!")
             }
         } catch (e) {
-            console.log(e)
             toast.error(e.message);
         }
     }
@@ -892,8 +889,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         } catch (err) {
             console.warn("Error computing asset size");
         }
-
-        // console.log(assetMetadata)
 
         this.setState({
             selectedAsset: assetMetadata,

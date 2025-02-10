@@ -12,6 +12,17 @@ export interface IYolov3Service {
 }
 
 export default class Yolov3Service implements IYolov3Service {
+    apiUrl: string;
+
+    constructor(autoDetectApiUrl?: string) {
+        if (autoDetectApiUrl)
+            this.apiUrl = autoDetectApiUrl;
+        else
+            this.apiUrl = `http://localhost:50505/api/YOLOv3/detect/`;
+
+        if (!this.apiUrl.endsWith("/"))
+            this.apiUrl += "/";
+    }
     public async DetectImageAsync(image_path: string): Promise<JsonResult> {
         try {
             const response = await fetch(`http://localhost:50505/api/YOLOv3/detect/${image_path}`);
