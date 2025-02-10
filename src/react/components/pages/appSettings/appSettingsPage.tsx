@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
 import { IApplicationState, IAppSettings } from "../../../../models/applicationState";
 import "./appSettingsPage.scss";
-import { strings } from "../../../../common/strings";
+import { strings, languages } from "../../../../common/strings";
 import { AppSettingsForm } from "./appSettingsForm";
 import { RouteComponentProps } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -68,21 +68,42 @@ export default class AppSettingsPage extends React.Component<IAppSettingsProps> 
                     <div className="my-3">
                         <p>{`${strings.appSettings.commit}: `} {process.env.REACT_APP_COMMIT_SHA}</p>
                     </div>
-                    { isElectron() &&
-                    <span>
-                        <div className="my-3">
-                            <p>{strings.appSettings.devTools.description}</p>
-                            <button id="toggleDevTools" className="btn btn-primary btn-sm"
-                                onClick={this.toggleDevTools}>{strings.appSettings.devTools.button}
-                            </button>
-                        </div>
-                        <div className="my-3">
-                            <p>{strings.appSettings.reload.description}</p>
-                            <button id="refreshApp" className="btn btn-primary btn-sm"
-                                onClick={this.reloadApp}>{strings.appSettings.reload.button}
-                            </button>
-                        </div>
-                    </span>
+                    {isElectron() &&
+                        <span>
+                            <div className="my-3">
+                                <p>{strings.appSettings.devTools.description}</p>
+                                <button id="toggleDevTools" className="btn btn-primary btn-sm"
+                                    onClick={this.toggleDevTools}>{strings.appSettings.devTools.button}</button>
+                            </div>
+                            <div className="my-3">
+                                <p>{strings.appSettings.reload.description}</p>
+                                <button id="refreshApp" className="btn btn-primary btn-sm"
+                                    onClick={this.reloadApp}>{strings.appSettings.reload.button}</button>
+                            </div>
+                            <hr />
+                            <div className="my-3 mt-3">
+                                <div className="form-group row">
+                                    {/* <p>{strings.appSettings.language.description}</p> */}
+                                    <label className="col-sm-5 col-form-label">
+                                        {strings.appSettings.language.description}
+                                    </label>
+                                    <div className="col-sm-6">
+                                        <select id="switchLanguage" className="form-control"
+                                            style={{ maxWidth: '120px' }}
+                                            value={this.props.appSettings.language}
+                                            onChange={(e) => this.switchLanguage(e)}>
+                                            {Object.keys(languages).map((language) =>
+                                                <option
+                                                    className="connection-option"
+                                                    key={language}
+                                                    value={language}>{languages[language]}
+                                                </option>)
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
                     }
                 </div>
             </div>
@@ -105,5 +126,12 @@ export default class AppSettingsPage extends React.Component<IAppSettingsProps> 
 
     private reloadApp = async () => {
         await this.props.actions.reloadApplication();
+    }
+
+    private switchLanguage = async (e) => {
+        await this.props.actions.saveAppSettings({
+            ...this.props.appSettings,
+            language: e.target.value,
+        });
     }
 }

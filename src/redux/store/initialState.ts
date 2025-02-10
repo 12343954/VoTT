@@ -1,7 +1,11 @@
-import { IApplicationState } from "../../models/applicationState";
+import { IAppSettings, IApplicationState } from "../../models/applicationState";
+
+const appSettings: IAppSettings = JSON.parse(localStorage.getItem('appSettings'));
+
 
 /**
  * Initial state of application
+ * @member user - Application settings
  * @member appSettings - Application settings
  * @member connections - Connections
  * @member recentProjects - Recent projects
@@ -10,6 +14,7 @@ import { IApplicationState } from "../../models/applicationState";
 const initialState: IApplicationState = {
     user: null,
     appSettings: {
+        language: appSettings ? (appSettings.language || "en") : "en",
         devToolsEnabled: false,
         securityTokens: [],
     },

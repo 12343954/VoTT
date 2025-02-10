@@ -1971,8 +1971,8 @@ pre code {
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: #52575C;
-  background-color: #fff;
+  color: #e8e8e8;
+  background-color: #2c2a2a;
   background-clip: padding-box;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
@@ -1995,8 +1995,8 @@ pre code {
 }
 
 .form-control:focus {
-  color: #52575C;
-  background-color: #fff;
+  color: #e8e8e8;
+  background-color: #2c2a2a;
   border-color: #757f89;
   outline: 0;
   -webkit-box-shadow: 0 0 0 0.2rem rgba(58, 63, 68, 0.25);

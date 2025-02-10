@@ -99,6 +99,9 @@ export const spanish: IAppStrings = {
             description: "Recargar la aplicación descartando todos los cambios actuales",
             button: "Recargar la aplicación",
         },
+        language: {
+            description: "UI idioma"
+        },
         messages: {
             saveSuccess: "Configuración de la aplicación guardada correctamente",
         },
@@ -306,7 +309,7 @@ export const spanish: IAppStrings = {
             saveProject: "Guardar Proyecto",
             exportProject: "Exprtar Proyecto",
             activeLearning: "Aprendizaje Activo",
-            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
+            yoloDetect: "AI Identificación automática", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

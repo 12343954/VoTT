@@ -104,6 +104,9 @@ export interface IAppStrings {
             description: string;
             button: string;
         },
+        language: {
+            description: string;
+        },
         messages: {
             saveSuccess: string;
         },
@@ -526,6 +529,15 @@ interface IErrorMetadata {
 }
 
 interface IStrings extends LocalizedStringsMethods, IAppStrings { }
+
+export const languages = {
+    "en": "English",
+    "es": "Español",
+    "ja": "日本語",
+    "ko": "한국어",
+    "tw": "繁体字",
+    "ch": "简体字",
+};
 
 export const strings: IStrings = new LocalizedStrings({
     // TODO: Need to comment out other languages which will not be used

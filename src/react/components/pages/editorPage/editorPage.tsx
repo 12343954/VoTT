@@ -783,7 +783,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     this.onAssetMetadataChanged(this.state.selectedAsset);
                 })
             } else {
-                toast.error(result.message || "YOLOv3 auto-detect function error!")
+                toast.error(result.message || "AI Auto-detect function error!")
             }
         } catch (e) {
             toast.error(e.message);

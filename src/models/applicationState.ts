@@ -86,6 +86,7 @@ export interface IProviderOptions {
  * @member securityTokens - Token used to encrypt sensitive project settings
  */
 export interface IAppSettings {
+    language?: string;
     devToolsEnabled: boolean;
     securityTokens: ISecurityToken[];
     thumbnailSize?: ISize;

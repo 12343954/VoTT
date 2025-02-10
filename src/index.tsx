@@ -14,17 +14,20 @@ import registerProviders from "./registerProviders";
 import registerMixins from "./registerMixins";
 
 import { setUpAppInsights } from "./telemetry";
+import { strings } from "./common/strings";
 
 setUpAppInsights();
 
 registerMixins();
 registerProviders();
+
 const defaultState: IApplicationState = initialState;
+strings.setLanguage(defaultState.appSettings.language);
 const store = createReduxStore(defaultState, true);
 
 ReactDOM.render(
     <Provider store={store}>
-        <App/>
+        <App />
     </Provider>
     , document.getElementById("root"));
 
@@ -32,3 +35,4 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
+

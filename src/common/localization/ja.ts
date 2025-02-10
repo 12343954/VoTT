@@ -100,6 +100,9 @@ export const japanese: IAppStrings = {
             description: "現在の変更をすべて破棄して、アプリをリロード", // Reload the app discarding all current changes,
             button: "アプリケーションをリフレッシュ", // Refresh Application"
         },
+        language: {
+            description: "UI 言語"
+        },
         messages: {
             saveSuccess: "アプリケーション設定を正常に保存しました", // Successfully saved application settings"
         },
@@ -311,7 +314,7 @@ export const japanese: IAppStrings = {
             saveProject: "プロジェクトを保存", // Save Project,
             exportProject: "プロジェクトをエクスポート",  // Export Project,
             activeLearning: "アクティブ ラーニング",  // Active Learning"
-            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
+            yoloDetect: "AI 自動識別", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

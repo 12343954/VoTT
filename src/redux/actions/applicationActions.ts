@@ -5,6 +5,7 @@ import { createPayloadAction, createAction, IPayloadAction } from "./actionCreat
 import { IAppSettings } from "../../models/applicationState";
 import { IProject, IApplicationState } from "../../models/applicationState";
 import { generateKey } from "../../common/crypto";
+import { strings } from "../../common/strings";
 
 /**
  * Actions to make changes to application settings
@@ -12,6 +13,7 @@ import { generateKey } from "../../common/crypto";
  * @member reloadApplication - Reload application
  */
 export default interface IApplicationActions {
+    switchLanguage(language: string): Promise<void>;
     toggleDevTools(show: boolean): Promise<void>;
     reloadApplication(): Promise<void>;
     saveAppSettings(appSettings: IAppSettings): IAppSettings;
@@ -49,6 +51,7 @@ export function reloadApplication(): (dispatch: Dispatch) => Promise<void> {
 export function saveAppSettings(appSettings: IAppSettings): (dispatch: Dispatch) => Promise<IAppSettings> {
     return (dispatch: Dispatch) => {
         dispatch(saveAppSettingsAction(appSettings));
+        strings.setLanguage(appSettings.language);
         return Promise.resolve(appSettings);
     };
 }

@@ -100,6 +100,9 @@ export const korean: IAppStrings = {
             description: "모든 변경사항을 버리고 애플리케이션을 재시작 합니다", // Reload the app discarding all current changes,
             button: "애플리케이션 새로고침", // Refresh Application
         },
+        language: {
+            description: "UI 언어"
+        },
         messages: {
             saveSuccess: "애플리케이션 설정이 성공적으로 저장되었습니다", // Successfully saved application settings
         },
@@ -312,7 +315,7 @@ export const korean: IAppStrings = {
             saveProject: "프로젝트 저장", // Save Project,
             exportProject: "프로젝트 내보내기",  // Export Project,
             activeLearning: "Active Learning",  // Active Learning"
-            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
+            yoloDetect: "AI 자동식별", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

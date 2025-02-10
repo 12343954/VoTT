@@ -53,21 +53,21 @@ export const chinese: IAppStrings = {
             logout: "退出",
             switch: "切换用户",
         },
-        account: "User Account",
-        name: "Nick Name",
-        password: "Password",
-        repassword: "Repassword",
+        account: "登录账号",
+        name: "名字",
+        password: "登录密码",
+        repassword: "重复密码",
         login: {
-            success: "Login successful, welcome!",
-            failure: "Login failed, please try again!"
+            success: "登录成功，欢迎回来！",
+            failure: "登录失败，请重试！"
         },
         logout: {
-            success: "Log out successful, goodbye!",
-            failure: "Log out failed, please try again!"
+            success: "再见！",
+            failure: "登录失败，请重试！"
         },
         save: {
-            success: "User information saved successfully!",
-            failure: "Failed to save user information!",
+            success: "用户信息保存成功！",
+            failure: "用户信息保存失败！",
         }
     },
     appSettings: {
@@ -100,6 +100,9 @@ export const chinese: IAppStrings = {
             description: "重新加载应用，放弃当前所有更改", // Reload the app discarding all current changes
             button: "刷新应用", // Refresh Application
         },
+        language: {
+            description: "UI 语言"
+        },
         messages: {
             saveSuccess: "成功保存应用程序设置", // Successfully saved application settings
         },
@@ -107,7 +110,7 @@ export const chinese: IAppStrings = {
     projectSettings: {
         title: "项目设定", // Project Settings
         autoDetectApi: {
-            title: "AI智能识别API地址",
+            title: "外部AI智能识别API地址",
             description: "e.g. http://somedomain.com/api/YOLOv3/detect/"
         },
         securityToken: {
@@ -311,7 +314,7 @@ export const chinese: IAppStrings = {
             saveProject: "保存项目", // Save Project
             exportProject: "导出项目", // Export Project
             activeLearning: "主动学习", // Active Learning
-            yoloDetect: "YOLO自动识别", // YOLOv3 auto-detect
+            yoloDetect: "AI 自动识别", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

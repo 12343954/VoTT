@@ -98,6 +98,9 @@ export const english: IAppStrings = {
             description: "Reload the app discarding all current changes",
             button: "Refresh Application",
         },
+        language: {
+            description: "UI language"
+        },
         messages: {
             saveSuccess: "Successfully saved application settings",
         },
@@ -105,7 +108,7 @@ export const english: IAppStrings = {
     projectSettings: {
         title: "Project Settings",
         autoDetectApi: {
-            title: "Auto-detect Api URL",
+            title: "External Auto-detect Api URL",
             description: "e.g. http://somedomain.com/api/YOLOv3/detect/"
         },
         securityToken: {
@@ -304,7 +307,7 @@ export const english: IAppStrings = {
             saveProject: "Save Project",
             exportProject: "Export Project",
             activeLearning: "Active Learning",
-            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
+            yoloDetect: "AI Auto-Detect", // AI auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

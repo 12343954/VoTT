@@ -100,6 +100,9 @@ export const chinesetw: IAppStrings = {
             description: "重新載入應用程式，放棄所有目前做的修改", // Reload the app discarding all current changes
             button: "重新整理應用程式", // Refresh Application
         },
+        language: {
+            description: "UI 語言"
+        },
         messages: {
             saveSuccess: "已成功保存應用程式設定", // Successfully saved application settings
         },
@@ -314,7 +317,7 @@ export const chinesetw: IAppStrings = {
             saveProject: "儲存專案", // Save Project
             exportProject: "匯出專案", // Export Project
             activeLearning: "主動學習", // Active Learning
-            yoloDetect: "YOLOv3 Auto-Detect", // YOLOv3 auto-detect
+            yoloDetect: "AI 自動識別", // YOLOv3 auto-detect
         },
         videoPlayer: {
             previousTaggedFrame: {

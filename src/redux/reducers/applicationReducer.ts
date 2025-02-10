@@ -11,6 +11,8 @@ import { AnyAction } from "../actions/actionCreators";
  */
 export const reducer = (state: IAppSettings = null, action: AnyAction): IAppSettings => {
     switch (action.type) {
+        // case ActionTypes.SWITCH_LANGUAGE_SUCCESS:
+        //     return { ...state, language: action.payload };
         case ActionTypes.TOGGLE_DEV_TOOLS_SUCCESS:
             return { ...state, devToolsEnabled: action.payload };
         case ActionTypes.REFRESH_APP_SUCCESS:
