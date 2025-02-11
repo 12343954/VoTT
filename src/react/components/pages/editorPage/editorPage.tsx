@@ -707,14 +707,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     toast(<div>
                         <h4>YOLOv3 Detected</h4>
                         <div style={{ margin: `5% 10%` }}>
-                            <table style={{ width: '100%' }}>
+                            <table className="table-auto-detect-result" style={{ width: '100%' }}>
                                 <thead><tr>
                                     <td style={{ width: '30px' }}></td>
                                     <td style={{ width: 'unset' }}></td>
                                     <td style={{ width: '40px' }}></td>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className={result.data.diff == 0 ? "ok" : "bad"}>
                                     {result.data.detect.sort((a, b) => a.id - b.id)
                                         .map(k => <tr key={k.id} style={{ color: k.obj_IDs.length > 1 ? 'black' : 'unset' }}
                                             onMouseEnter={() => this.onHighlightRegion(k, 'enter')}
@@ -811,7 +811,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     // smith added 2024-4-4
     private onHighlightRegion = async (detection: any, type: string) => {
-        // console.log(type, detection, this.state.selectedAsset.regions);
+        if (!/#\/projects\/\w+\/edit/.test(window.location.hash)) {
+            document.querySelectorAll('[class~="Toastify__toast"]').forEach(k => k.remove())
+            return;
+        }
         switch (type) {
             case 'enter':
                 let center = detection.center.split(',')

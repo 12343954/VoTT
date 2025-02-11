@@ -25,7 +25,7 @@ export default class Yolov3Service implements IYolov3Service {
     }
     public async DetectImageAsync(image_path: string): Promise<JsonResult> {
         try {
-            const response = await fetch(`http://localhost:50505/api/YOLOv3/detect/${image_path}`);
+            const response = await fetch(`${this.apiUrl}${image_path}`);
             const result: JsonResult = await response.json();
             return Promise.resolve(result);
         } catch (error) {

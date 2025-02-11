@@ -62,10 +62,6 @@ export class AppSettingsForm extends React.Component<IAppSettingsFormProps, IApp
     private reloadShema = () => {
         this.formSchema = addLocValues(require("./appSettingsForm.json"));
         this.uiSchema = addLocValues(require("./appSettingsForm.ui.json"));
-        // this.setState({
-        //     uiSchema: { ...this.uiSchema },
-        //     formSchema: { ...this.formSchema },
-        // })
     }
 
     public componentDidUpdate(prevProps: IAppSettingsFormProps) {
