@@ -1,4 +1,17 @@
 ### Microsoft no longer maintains VoTT ! (so sad ...)
+
+# (2026-10-10) VoTT v4.0.0, release note:
+
+- **Modern Electron runtime**: upgraded from Electron 3 to Electron 22 for better compatibility with current Windows, macOS, and Linux systems.
+- **Apple Silicon support**: added native macOS arm64 packaging for M-series Macs.
+- **Automated releases**: GitHub Actions now builds release packages for Windows, macOS, and Linux.
+- **Installer and portable builds**: release artifacts now distinguish between `setup` installers and `portable` zip packages.
+- **Custom Windows install path**: the Windows installer supports choosing the installation directory.
+- **More secure Electron integration**: added a preload bridge with context isolation enabled and Node integration disabled.
+- **Improved annotation workflow**: region drawing, selection, canvas repainting, and tag application behavior were refined.
+- **Configurable tag hotkeys**: tag shortcuts can now be customized in application settings.
+- **Project tag color editing**: added a built-in color picker for project tags.
+
 # (2024-4-7) I add automatically annotate image via YOLOv3 auto-detect webapi  into VoTT 2.2.2
 
 - feat: Automatically annotate images via YOLOv3 auto-detect webapi (with [AlexeyAB](https://github.com/AlexeyAB/darknet)'s YOLOv3 `yolo_cpp_dll.dll` which written in 2019, the fastest YOLO on RTX20 series graphics cards, 30+ fps)
