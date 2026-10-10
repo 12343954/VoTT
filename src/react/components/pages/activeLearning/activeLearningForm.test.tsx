@@ -27,6 +27,18 @@ describe("Active Learning Form", () => {
         return mount(<ActiveLearningForm {...props} />);
     }
 
+    function createFormEvent(formData: Partial<IActiveLearningSettings>) {
+        return {
+            formData,
+            edit: null,
+            errors: [],
+            errorSchema: null,
+            idSchema: null,
+            uiSchema: null,
+            schema: null,
+        };
+    }
+
     it("renders a dynamic json schema form with default props", () => {
         const wrapper = createComponent();
         expect(wrapper.find(Form).exists()).toBe(true);
@@ -72,16 +84,16 @@ describe("Active Learning Form", () => {
         };
 
         // Set type to URL
-        wrapper.find(Form).props().onChange({ formData: { modelPathType: ModelPathType.Url } });
+        wrapper.find(Form).props().onChange(createFormEvent({ modelPathType: ModelPathType.Url }));
         // Set the remaining settings
-        wrapper.find(Form).props().onChange({ formData });
+        wrapper.find(Form).props().onChange(createFormEvent(formData));
         expect(wrapper.state().formData).toEqual(formData);
         expect(onChangeHandler).toBeCalledWith(formData);
     });
 
     it("submits form data to the registered submit handler", () => {
         const wrapper = createComponent();
-        wrapper.find(Form).props().onSubmit({ formData: defaultProps.settings });
+        wrapper.find(Form).props().onSubmit(createFormEvent(defaultProps.settings));
 
         expect(onSubmitHandler).toBeCalledWith(defaultProps.settings);
     });
