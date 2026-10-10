@@ -24,9 +24,9 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
 linux:
+  category: Graphics
   target:
     - AppImage
-    - deb
     - zip
 publish: null
 electronVersion: 3.0.13
