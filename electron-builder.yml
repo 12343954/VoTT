@@ -4,7 +4,7 @@ directories:
   output: releases
   buildResources: app-icons # this is where app-icons is store
 appId: com.microsoft.vott
-artifactName: '${productName}-${version}-${platform}-${arch}.${ext}'
+artifactName: '${productName}-${version}-${platform}-${arch}-portable.${ext}'
 extends: null # need this otherwise it won't use the entry point we set in "main" in package.json
 files:
   - filter:
@@ -15,12 +15,15 @@ mac:
     - dmg
     - zip
   identity: null  # don't sign the app
+dmg:
+  artifactName: '${productName}-${version}-macos-${arch}-setup.${ext}'
 win:
   icon: app-icons/icon.ico
   target:
     - nsis
     - zip
 nsis:
+  artifactName: '${productName}-${version}-windows-${arch}-setup.${ext}'
   oneClick: false
   allowToChangeInstallationDirectory: true
 linux:
