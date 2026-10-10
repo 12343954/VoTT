@@ -11,13 +11,23 @@ files:
       - build/  # copy this directory to the asar directory that electron-builder use to look for the main entry file
 mac:
   icon: app-icons/icon.icns
-  target: dmg
+  target:
+    - dmg
+    - zip
   identity: null  # don't sign the app
 win:
   icon: app-icons/icon.ico
+  target:
+    - nsis
+    - zip
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
 linux:
   target:
-    - snap
+    - AppImage
+    - deb
+    - zip
 publish: null
 electronVersion: 3.0.13
 extraFiles:
