@@ -21,7 +21,7 @@ jobs:
             os: windows-latest
             target: --win --x64
           - name: macos-arm64
-            os: macos-15
+            os: macos-26
             target: --mac zip --arm64
           - name: linux-x64
             os: ubuntu-latest
