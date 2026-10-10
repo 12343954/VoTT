@@ -90,6 +90,7 @@ export interface IAppSettings {
     devToolsEnabled: boolean;
     securityTokens: ISecurityToken[];
     thumbnailSize?: ISize;
+    tagHotkeys?: string[];
 }
 
 export interface IUser {

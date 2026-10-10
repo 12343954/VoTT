@@ -16,6 +16,7 @@ import { StatusBar } from "./react/components/shell/statusBar";
 import { StatusBarMetrics } from "./react/components/shell/statusBarMetrics";
 import { HelpMenu } from "./react/components/shell/helpMenu";
 import history from "./history";
+import { getHostPlatform } from "./common/hostProcess";
 
 interface IAppProps {
     currentProject?: IProject;
@@ -59,7 +60,7 @@ export default class App extends React.Component<IAppProps> {
     }
 
     public render() {
-        const platform = global && global.process ? global.process.platform : "web";
+        const platform = getHostPlatform();
 
         return (
             <Fragment>

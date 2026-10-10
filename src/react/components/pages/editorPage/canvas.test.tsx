@@ -221,6 +221,22 @@ describe("Editor Canvas", () => {
         ]);
     });
 
+    it("applies tag selected while drawing to new region", () => {
+        const wrapper = createComponent();
+        const canvas = wrapper.instance();
+        const newRegionData = MockFactory.createTestRegionData();
+        (canvas.editor.RM.getSelectedRegionsBounds as any) = jest.fn(() => []);
+
+        canvas.editor.onSelectionBegin();
+        canvas.applyTag("tag1");
+        canvas.editor.onSelectionEnd(newRegionData);
+
+        const newRegion = wrapper.state().currentAsset.regions
+            .find((r) => r.boundingBox.left === newRegionData.x && r.boundingBox.top === newRegionData.y);
+
+        expect(newRegion.tags).toEqual(["tag1"]);
+    });
+
     it("copies correct rectangle for copyRect", () => {
         const wrapper = createComponent();
         const onAssetMetadataChanged = jest.fn();

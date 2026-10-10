@@ -35,7 +35,7 @@ export interface IEditorToolbarState {
 export class EditorToolbar extends React.Component<IEditorToolbarProps, IEditorToolbarState> {
 
     public state = {
-        selectedItem: ToolbarItemName.SelectCanvas,
+        selectedItem: ToolbarItemName.DrawRectangle,
     };
 
     public render() {

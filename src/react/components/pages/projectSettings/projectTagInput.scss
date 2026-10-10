@@ -1,0 +1,64 @@
+.project-tag-color-picker {
+  position: fixed;
+  z-index: 10000;
+  width: 220px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 4px;
+  background: #2f3439;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .38);
+  color: #fff;
+}
+
+.project-tag-color-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 8px 0 10px;
+  cursor: move;
+  user-select: none;
+  background: #252a2f;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.project-tag-color-picker-header span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-tag-color-picker-header button {
+  border: 0;
+  background: transparent;
+  color: #d8dde2;
+  font-size: 20px;
+  line-height: 20px;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.project-tag-color-picker-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.project-tag-color-picker-body input[type="color"] {
+  width: 44px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: transparent;
+}
+
+.project-tag-color-picker-body input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 3px;
+  background: #1e2226;
+  color: #fff;
+}

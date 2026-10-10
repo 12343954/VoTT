@@ -38,6 +38,8 @@ export interface ITagInputProps {
     showTagInputBox?: boolean;
     /** Always show tag search box */
     showSearchBox?: boolean;
+    /** Tag hotkey list, where item index maps to tag index */
+    tagHotkeys?: string[];
 }
 
 export interface ITagInputState {
@@ -329,6 +331,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                 isBeingEdited: this.state.editingTag && this.state.editingTag.name === tag.name,
                 isSelected: this.state.selectedTag && this.state.selectedTag.name === tag.name,
                 appliedToSelectedRegions: selectedRegionTagSet.has(tag.name),
+                hotkey: this.props.tagHotkeys && this.props.tagHotkeys[tags.findIndex((t) => t.name === tag.name)],
                 onClick: this.handleClick,
                 onChange: this.updateTag,
             } as ITagInputItemProps
@@ -364,6 +367,8 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         if (props.ctrlKey && this.props.onCtrlTagClick) {
             this.props.onCtrlTagClick(tag);
             this.setState({ clickedColor: props.clickedColor });
+        } else if (props.clickedColor) { // Edit tag color
+            this.onAltClick(tag, true);
         } else if (props.altKey) { // Edit tag
             this.onAltClick(tag, props.clickedColor);
         } else { // Select tag

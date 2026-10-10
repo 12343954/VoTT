@@ -9,7 +9,27 @@ const electronMock = {
     ipcRenderer: {
         send: jest.fn(),
         on: jest.fn(),
+        setMaxListeners: jest.fn(),
+    },
+    app: {
+        getAppPath: jest.fn(),
+    },
+    process: {
+        platform: "win32",
+    },
+    currentWindow: {
+        on: jest.fn(),
+        isMaximized: jest.fn(),
+        isFullScreen: jest.fn(),
+        setTitle: jest.fn(),
+        minimize: jest.fn(),
+        maximize: jest.fn(),
+        unmaximize: jest.fn(),
+        close: jest.fn(),
+    },
+    menu: {
+        getApplicationMenu: jest.fn(),
     },
 };
 
-window.require = jest.fn(() => electronMock);
+window.vottElectron = electronMock;

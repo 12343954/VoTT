@@ -14,7 +14,9 @@ import Confirm from "../../common/confirm/confirm";
 import { strings } from "../../../../common/strings";
 import { SelectionMode } from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import { Rect } from "vott-ct/lib/js/CanvasTools/Core/Rect";
+import { Point2D } from "vott-ct/lib/js/CanvasTools/Core/Point2D";
 import { createContentBoundingBox } from "../../../../common/layout";
+import { getElectronHost, hasElectronHost } from "../../../../common/electronHost";
 
 export interface ICanvasProps extends React.Props<Canvas> {
     selectedAsset: IAssetMetadata;
@@ -35,6 +37,9 @@ export interface ICanvasState {
 }
 
 export default class Canvas extends React.Component<ICanvasProps, ICanvasState> {
+    private static minRectangleSize = 3;
+    private static drawTimingLogInitialized = false;
+
     public static defaultProps: ICanvasProps = {
         selectionMode: SelectionMode.NONE,
         editorMode: EditorMode.Select,
@@ -51,31 +56,49 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         enabled: false,
     };
 
+    private currentAsset: IAssetMetadata = this.props.selectedAsset;
+    private isDrawingRegion = false;
+    private pendingDrawTags: string[] = [];
+    private suppressCanvasToolsRefresh = false;
+    private selectedRegionId: string = null;
+    private restoringSelectedRegion = false;
+    private selectionBoxHideTimer: number = null;
+    private rectPointerUpHandler: (event: PointerEvent) => void = null;
+    private drawTimingStart: number = null;
+    private drawTimingLast: number = null;
+    private drawTimingId = 0;
+
     private canvasZone: React.RefObject<HTMLDivElement> = React.createRef();
     private clearConfirm: React.RefObject<Confirm> = React.createRef();
 
     private template: Rect = new Rect(20, 20);
 
     public componentDidMount = () => {
+        this.initializeDrawTimingLog();
         const sz = document.getElementById("editor-zone") as HTMLDivElement;
         this.editor = new CanvasTools.Editor(sz);
         this.editor.autoResize = false;
+        this.editor.onSelectionBegin = this.onSelectionBegin;
         this.editor.onSelectionEnd = this.onSelectionEnd;
         this.editor.onRegionMoveEnd = this.onRegionMoveEnd;
         this.editor.onRegionDelete = this.onRegionDelete;
         this.editor.onRegionSelected = this.onRegionSelected;
         this.editor.AS.setSelectionMode({ mode: this.props.selectionMode });
+        this.installImmediateRectPointerUp();
 
         window.addEventListener("resize", this.onWindowResize);
     }
 
     public componentWillUnmount() {
+        this.clearSelectionBoxHideTimer();
+        this.uninstallImmediateRectPointerUp();
         window.removeEventListener("resize", this.onWindowResize);
     }
 
     public componentDidUpdate = async (prevProps: Readonly<ICanvasProps>, prevState: Readonly<ICanvasState>) => {
         // Handles asset changing
         if (this.props.selectedAsset !== prevProps.selectedAsset) {
+            this.currentAsset = this.props.selectedAsset;
             this.setState({ currentAsset: this.props.selectedAsset });
         }
 
@@ -89,7 +112,11 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         // When the selected asset has changed but is still the same asset id
         if (!assetIdChanged && this.state.currentAsset !== prevState.currentAsset) {
-            this.refreshCanvasToolsRegions();
+            if (this.suppressCanvasToolsRefresh) {
+                this.suppressCanvasToolsRefresh = false;
+            } else {
+                this.refreshCanvasToolsRegions();
+            }
         }
 
         // When the project tags change re-apply tags to regions
@@ -146,6 +173,10 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         const lockedTags = this.props.lockedTags;
         const lockedTagsEmpty = !lockedTags || !lockedTags.length;
         const regionsEmpty = !selectedRegions || !selectedRegions.length;
+        if (regionsEmpty && tag && this.isDrawingRegion) {
+            this.pendingDrawTags = lockedTagsEmpty ? [tag] : lockedTags;
+            return;
+        }
         if ((!tag && lockedTagsEmpty) || regionsEmpty) {
             return;
         }
@@ -196,8 +227,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     public getSelectedRegions = (): IRegion[] => {
-        const selectedRegions = this.editor.RM.getSelectedRegionsBounds().map((rb) => rb.id);
-        return this.state.currentAsset.regions.filter((r) => selectedRegions.find((id) => r.id === id));
+        const selectedRegionBounds = this.editor.RM.getSelectedRegionsBounds() || [];
+        const selectedRegions = selectedRegionBounds.map((rb) => rb.id);
+        if (!this.currentAsset || !this.currentAsset.regions) {
+            return [];
+        }
+        return this.currentAsset.regions.filter((r) => selectedRegions.find((id) => r.id === id));
     }
 
     // smith add 2024-4-4
@@ -280,13 +315,35 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @param {RegionData} regionData the RegionData of created region
      * @returns {void}
      */
+    private onSelectionBegin = () => {
+        this.startDrawTiming("selection-begin");
+        this.clearSelectionBoxHideTimer();
+        this.resetSelectionBoxStyle();
+        this.isDrawingRegion = true;
+        this.pendingDrawTags = [];
+    }
+
     private onSelectionEnd = (regionData: RegionData) => {
-        if (CanvasHelpers.isEmpty(regionData)) {
+        this.logDrawTiming("selection-end-enter", {
+            height: regionData && regionData.height,
+            width: regionData && regionData.width,
+            x: regionData && regionData.x,
+            y: regionData && regionData.y,
+        });
+        if (CanvasHelpers.isEmpty(regionData) || this.isTooSmallRectangle(regionData)) {
+            this.isDrawingRegion = false;
+            this.pendingDrawTags = [];
+            this.logDrawTiming("selection-end-ignored");
             return;
         }
         const id = shortid.generate();
 
+        const addRegionStart = performance.now();
         this.editor.RM.addRegion(id, regionData, null);
+        this.logDrawTiming("rm-add-region", {
+            duration: Math.round((performance.now() - addRegionStart) * 100) / 100,
+            id,
+        });
 
         this.template = new Rect(regionData.width, regionData.height);
 
@@ -297,10 +354,11 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             this.state.currentAsset.asset.size.height,
         );
         const lockedTags = this.props.lockedTags;
+        const newRegionTags = (lockedTags && lockedTags.length) ? lockedTags : this.pendingDrawTags;
         const newRegion = {
             id,
             type: this.editorModeToType(this.props.editorMode),
-            tags: lockedTags || [],
+            tags: newRegionTags || [],
             boundingBox: {
                 height: scaledRegionData.height,
                 width: scaledRegionData.width,
@@ -309,12 +367,347 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             },
             points: scaledRegionData.points,
         };
-        if (lockedTags && lockedTags.length) {
+        if (newRegion.tags && newRegion.tags.length) {
+            const updateTagsStart = performance.now();
             this.editor.RM.updateTagsById(id, CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
+            this.logDrawTiming("rm-update-tags", {
+                duration: Math.round((performance.now() - updateTagsStart) * 100) / 100,
+                id,
+            });
         }
-        this.updateAssetRegions([...this.state.currentAsset.regions, newRegion]);
+        this.isDrawingRegion = false;
+        this.pendingDrawTags = [];
+        this.hideSelectionBox();
+        this.logDrawTiming("before-update-asset-regions", { id });
+        this.updateAssetRegions([...this.currentAsset.regions, newRegion]);
+        this.logDrawTiming("after-update-asset-regions", { id });
+        this.selectRegionImmediately(newRegion);
+        this.logDrawTiming("selection-end-exit", { id });
+    }
+
+    private isTooSmallRectangle(regionData: RegionData): boolean {
+        const rectangleMode = this.props.editorMode === EditorMode.Rectangle
+            || this.props.editorMode === EditorMode.CopyRect;
+
+        return rectangleMode
+            && (regionData.width < Canvas.minRectangleSize || regionData.height < Canvas.minRectangleSize);
+    }
+
+    private redrawRegions = () => {
+        const regionsManager = this.editor.RM as any;
+        if (regionsManager.redrawAllRegions) {
+            regionsManager.redrawAllRegions();
+        }
+    }
+
+    private hideSelectionBox = () => {
+        if (!this.canvasZone.current) {
+            return;
+        }
+
+        const selectionBox = this.canvasZone.current.querySelector(".selectionBoxStyle");
+        if (selectionBox) {
+            selectionBox.setAttribute("visibility", "hidden");
+        }
+    }
+
+    private showSelectionBoxAsSelected = () => {
+        if (!this.canvasZone.current) {
+            return;
+        }
+
+        const selectionBox = this.canvasZone.current.querySelector(".selectionBoxStyle") as SVGElement;
+        if (!selectionBox) {
+            return;
+        }
+
+        selectionBox.setAttribute("visibility", "visible");
+        selectionBox.setAttribute("fill", "rgba(255, 255, 255, 0.15)");
+        selectionBox.setAttribute("stroke", "#ffffff");
+        selectionBox.setAttribute("stroke-width", "2");
+        selectionBox.setAttribute("stroke-dasharray", "none");
+        selectionBox.setAttribute("pointer-events", "none");
+        this.selectionBoxHideTimer = window.setTimeout(() => this.hideSelectionBox(), 1500);
+    }
+
+    private resetSelectionBoxStyle = () => {
+        if (!this.canvasZone.current) {
+            return;
+        }
+
+        const selectionBox = this.canvasZone.current.querySelector(".selectionBoxStyle") as SVGElement;
+        if (!selectionBox) {
+            return;
+        }
+
+        selectionBox.removeAttribute("fill");
+        selectionBox.removeAttribute("stroke");
+        selectionBox.removeAttribute("stroke-width");
+        selectionBox.removeAttribute("stroke-dasharray");
+        selectionBox.removeAttribute("pointer-events");
+    }
+
+    private clearSelectionBoxHideTimer = () => {
+        if (this.selectionBoxHideTimer) {
+            window.clearTimeout(this.selectionBoxHideTimer);
+            this.selectionBoxHideTimer = null;
+        }
+    }
+
+    private selectRegionImmediately = (region: IRegion) => {
+        const selectStart = performance.now();
+        this.editor.RM.selectRegionById(region.id);
+        this.forceSelectedRegionStyle(region.id);
+        this.forceCanvasRepaint();
+        this.logDrawTiming("select-region-sync", {
+            duration: Math.round((performance.now() - selectStart) * 100) / 100,
+            id: region.id,
+            selectedDom: this.hasSelectedRegionDom(region.id),
+            regionDom: this.getRegionDomSnapshot(region.id),
+        });
+        this.scheduleRegionDomSnapshots(region.id);
         if (this.props.onSelectedRegionsChanged) {
-            this.props.onSelectedRegionsChanged([newRegion]);
+            this.props.onSelectedRegionsChanged([region]);
+        }
+        window.requestAnimationFrame(() => {
+            const rafSelectStart = performance.now();
+            this.editor.RM.selectRegionById(region.id);
+            this.forceSelectedRegionStyle(region.id);
+            this.forceCanvasRepaint();
+            this.logDrawTiming("select-region-raf", {
+                duration: Math.round((performance.now() - rafSelectStart) * 100) / 100,
+                id: region.id,
+                selectedDom: this.hasSelectedRegionDom(region.id),
+                regionDom: this.getRegionDomSnapshot(region.id),
+            });
+            if (this.props.onSelectedRegionsChanged) {
+                this.props.onSelectedRegionsChanged([region]);
+            }
+        });
+    }
+
+    private forceSelectedRegionStyle = (id: string) => {
+        const regionsManager = this.editor.RM as any;
+        if (!regionsManager.lookupRegionByID) {
+            return;
+        }
+
+        const region = regionsManager.lookupRegionByID(id);
+        if (region && region.node) {
+            region.isSelected = true;
+            region.node.addClass("selected");
+        }
+    }
+
+    private hasSelectedRegionDom = (id: string): boolean => {
+        const regionsManager = this.editor.RM as any;
+        if (!regionsManager.lookupRegionByID) {
+            return false;
+        }
+
+        const region = regionsManager.lookupRegionByID(id);
+        return !!region && !!region.node && !!region.node.hasClass && region.node.hasClass("selected");
+    }
+
+    private getRegionDomSnapshot = (id: string): object => {
+        const regionsManager = this.editor.RM as any;
+        if (!regionsManager.lookupRegionByID) {
+            return {};
+        }
+
+        const region = regionsManager.lookupRegionByID(id);
+        const snapNode = region && region.node;
+        const domNode = snapNode && snapNode.node;
+        if (!snapNode || !domNode) {
+            return { exists: false };
+        }
+
+        const computedStyle = window.getComputedStyle(domNode);
+        return {
+            className: domNode.getAttribute("class"),
+            display: computedStyle.display,
+            exists: true,
+            opacity: computedStyle.opacity,
+            stroke: snapNode.attr ? snapNode.attr("stroke") : domNode.getAttribute("stroke"),
+            strokeDasharray: snapNode.attr ? snapNode.attr("stroke-dasharray") : domNode.getAttribute("stroke-dasharray"),
+            visibility: computedStyle.visibility,
+        };
+    }
+
+    private scheduleRegionDomSnapshots = (id: string) => {
+        window.requestAnimationFrame(() => {
+            this.logDrawTiming("region-dom-snapshot-raf1", {
+                id,
+                regionDom: this.getRegionDomSnapshot(id),
+            });
+            window.requestAnimationFrame(() => {
+                this.logDrawTiming("region-dom-snapshot-raf2", {
+                    id,
+                    regionDom: this.getRegionDomSnapshot(id),
+                });
+            });
+        });
+        window.setTimeout(() => {
+            this.logDrawTiming("region-dom-snapshot-100ms", {
+                id,
+                regionDom: this.getRegionDomSnapshot(id),
+            });
+        }, 100);
+    }
+
+    private forceCanvasRepaint = () => {
+        if (!this.canvasZone.current) {
+            return;
+        }
+
+        const canvasZone = this.canvasZone.current;
+        const currentTransform = canvasZone.style.transform;
+        canvasZone.style.transform = currentTransform || "translateZ(0)";
+        void canvasZone.getBoundingClientRect();
+        window.requestAnimationFrame(() => {
+            if (canvasZone.style.transform === "translateZ(0)") {
+                canvasZone.style.transform = "";
+            }
+        });
+    }
+
+    private installImmediateRectPointerUp = () => {
+        const areaSelector = this.editor.AS as any;
+        const rectSelector = areaSelector && areaSelector.rectSelector;
+        if (!rectSelector || !rectSelector.parentNode || this.rectPointerUpHandler) {
+            return;
+        }
+
+        this.rectPointerUpHandler = (event: PointerEvent) => {
+            const activeSelector = areaSelector.selector;
+            if (activeSelector !== rectSelector
+                || !rectSelector.isEnabled
+                || !rectSelector.capturingState
+                || rectSelector.isTwoPoints) {
+                return;
+            }
+
+            this.logDrawTiming("pointerup-capture", {
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            const rect = rectSelector.parentNode.getClientRects();
+            if (!rect || !rect.length) {
+                return;
+            }
+
+            const p = new Point2D(event.clientX - rect[0].left, event.clientY - rect[0].top);
+            rectSelector.moveCross(rectSelector.crossB, p, rectSelector.selectionModificator === 1, rectSelector.crossA);
+            rectSelector.moveSelectionBox(rectSelector.selectionBox, rectSelector.crossA, rectSelector.crossB);
+            rectSelector.capturingState = false;
+
+            try {
+                rectSelector.parentNode.releasePointerCapture(event.pointerId);
+            } catch (error) {
+                // Pointer capture can already be gone on some Electron/macOS paths.
+            }
+
+            this.hideSelectorElement(rectSelector.crossB);
+            this.hideSelectorElement(rectSelector.mask);
+            this.hideSelectorElement(rectSelector.selectionBox);
+
+            if (typeof rectSelector.callbacks.onSelectionEnd === "function") {
+                const x = Math.min(rectSelector.crossA.x, rectSelector.crossB.x);
+                const y = Math.min(rectSelector.crossA.y, rectSelector.crossB.y);
+                const width = Math.abs(rectSelector.crossA.x - rectSelector.crossB.x);
+                const height = Math.abs(rectSelector.crossA.y - rectSelector.crossB.y);
+                this.logDrawTiming("pointerup-before-callback", { height, width, x, y });
+                rectSelector.callbacks.onSelectionEnd(RegionData.BuildRectRegionData(x, y, width, height));
+                this.logDrawTiming("pointerup-after-callback");
+            }
+        };
+
+        rectSelector.parentNode.addEventListener("pointerup", this.rectPointerUpHandler, true);
+    }
+
+    private uninstallImmediateRectPointerUp = () => {
+        const areaSelector = this.editor && this.editor.AS as any;
+        const rectSelector = areaSelector && areaSelector.rectSelector;
+        if (rectSelector && rectSelector.parentNode && this.rectPointerUpHandler) {
+            rectSelector.parentNode.removeEventListener("pointerup", this.rectPointerUpHandler, true);
+        }
+        this.rectPointerUpHandler = null;
+    }
+
+    private hideSelectorElement = (element: any) => {
+        if (!element) {
+            return;
+        }
+
+        if (element.hide) {
+            element.hide();
+        } else if (element.node) {
+            element.node.setAttribute("visibility", "hidden");
+        }
+    }
+
+    private startDrawTiming = (label: string) => {
+        const now = performance.now();
+        this.drawTimingStart = now;
+        this.drawTimingLast = now;
+        this.drawTimingId++;
+        this.logDrawTiming(label);
+    }
+
+    private logDrawTiming = (label: string, data: object = {}) => {
+        const now = performance.now();
+        if (!this.drawTimingStart) {
+            this.drawTimingStart = now;
+            this.drawTimingLast = now;
+            this.drawTimingId++;
+        }
+
+        const fromStart = Math.round((now - this.drawTimingStart) * 100) / 100;
+        const fromPrevious = Math.round((now - this.drawTimingLast) * 100) / 100;
+        this.drawTimingLast = now;
+        const entry = {
+            id: this.drawTimingId,
+            label,
+            fromPrevious,
+            fromStart,
+            time: new Date().toISOString(),
+            ...data,
+        };
+        console.info("[VoTT draw timing]", entry);
+        this.writeDrawTimingLog(entry);
+    }
+
+    private initializeDrawTimingLog = () => {
+        if (Canvas.drawTimingLogInitialized || !hasElectronHost()) {
+            return;
+        }
+
+        Canvas.drawTimingLogInitialized = true;
+        try {
+            const diagnostics = getElectronHost().diagnostics;
+            diagnostics.clearDrawTimingLog();
+            diagnostics.writeDrawTimingLog(JSON.stringify({
+                label: "log-start",
+                path: diagnostics.getDrawTimingLogPath(),
+                time: new Date().toISOString(),
+            }));
+        } catch (error) {
+            console.warn(error);
+        }
+    }
+
+    private writeDrawTimingLog = (entry: object) => {
+        if (!hasElectronHost()) {
+            return;
+        }
+
+        try {
+            getElectronHost().diagnostics.writeDrawTimingLog(JSON.stringify(entry));
+        } catch (error) {
+            console.warn(error);
         }
     }
 
@@ -325,9 +718,11 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      */
     private updateAssetRegions = (regions: IRegion[]) => {
         const currentAsset: IAssetMetadata = {
-            ...this.state.currentAsset,
+            ...this.currentAsset,
             regions,
         };
+        this.currentAsset = currentAsset;
+        this.suppressCanvasToolsRefresh = true;
         this.setState({
             currentAsset,
         }, () => {
@@ -371,6 +766,10 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @returns {void}
      */
     private onRegionDelete = (id: string) => {
+        if (this.selectedRegionId === id) {
+            this.selectedRegionId = null;
+        }
+
         // Remove from Canvas Tools
         this.editor.RM.deleteRegionById(id);
 
@@ -392,6 +791,16 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @returns {void}
      */
     private onRegionSelected = (id: string, multiSelect: boolean) => {
+        if (!id) {
+            if (this.selectedRegionId && !this.restoringSelectedRegion && this.regionExists(this.selectedRegionId)) {
+                this.restoringSelectedRegion = true;
+                this.editor.RM.selectRegionById(this.selectedRegionId);
+                this.restoringSelectedRegion = false;
+            }
+            return;
+        }
+
+        this.selectedRegionId = id;
         const selectedRegions = this.getSelectedRegions();
         if (this.props.onSelectedRegionsChanged) {
             this.props.onSelectedRegionsChanged(selectedRegions);
@@ -409,6 +818,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             }
             this.updateRegions(selectedRegions);
         }
+    }
+
+    private regionExists = (id: string): boolean => {
+        return !!this.currentAsset
+            && !!this.currentAsset.regions
+            && this.currentAsset.regions.some((region) => region.id === id);
     }
 
     private renderChildren = () => {
@@ -483,6 +898,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             return;
         }
 
+        this.fitImageContentSource(contentSource);
+
         const canvas = this.canvasZone.current;
         if (canvas) {
             const boundingBox = createContentBoundingBox(contentSource);
@@ -492,6 +909,24 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             canvas.style.height = `${boundingBox.height}px`;
             this.editor.resize(boundingBox.width, boundingBox.height);
         }
+    }
+
+    private fitImageContentSource = (contentSource: ContentSource) => {
+        if (!(contentSource instanceof HTMLImageElement)) {
+            return;
+        }
+
+        const container = contentSource.parentElement;
+        if (!container || !contentSource.naturalWidth || !contentSource.naturalHeight) {
+            return;
+        }
+
+        const widthScale = container.clientWidth / contentSource.naturalWidth;
+        const heightScale = container.clientHeight / contentSource.naturalHeight;
+        const scale = Math.min(widthScale, heightScale);
+
+        contentSource.style.width = `${contentSource.naturalWidth * scale}px`;
+        contentSource.style.height = `${contentSource.naturalHeight * scale}px`;
     }
 
     /**
@@ -529,12 +964,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     private refreshCanvasToolsRegions = () => {
         this.clearAllRegions();
 
-        if (!this.state.currentAsset.regions || this.state.currentAsset.regions.length === 0) {
+        if (!this.currentAsset.regions || this.currentAsset.regions.length === 0) {
             return;
         }
 
         // Add regions to the canvas
-        this.state.currentAsset.regions.forEach((region: IRegion) => {
+        this.currentAsset.regions.forEach((region: IRegion) => {
             const loadedRegionData = CanvasHelpers.getRegionData(region);
             this.editor.RM.addRegion(
                 region.id,

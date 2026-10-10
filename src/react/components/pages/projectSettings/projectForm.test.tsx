@@ -9,6 +9,7 @@ import { IProjectVideoSettings } from "../../../../models/applicationState";
 import { SecurityTokenPicker } from "../../common/securityTokenPicker/securityTokenPicker";
 import { ConnectionPickerWithRouter } from "../../common/connectionPicker/connectionPicker";
 import { TagsInput } from "vott-react";
+import ProjectTagInput from "./projectTagInput";
 
 describe("Project Form Component", () => {
     const project = MockFactory.createTestProject("TestProject");
@@ -51,6 +52,7 @@ describe("Project Form Component", () => {
         it("renders the form correctly", () => {
             expect(wrapper.find(SecurityTokenPicker)).toHaveLength(1);
             expect(wrapper.find(ConnectionPickerWithRouter)).toHaveLength(2);
+            expect(wrapper.find(ProjectTagInput)).toHaveLength(1);
             expect(wrapper.find(TagsInput)).toHaveLength(1);
         });
 
@@ -68,6 +70,16 @@ describe("Project Form Component", () => {
         it("starting project has correct initial rendering", () => {
             expect(project.tags.length).toBeGreaterThan(0);
             expect(wrapper.find(".tag-wrapper")).toHaveLength(project.tags.length);
+        });
+
+        it("updates tag color when double clicking color box", () => {
+            const newColor = "#123456";
+            wrapper.find(".tag-color-box").first().simulate("doubleclick");
+            wrapper.find("input[type=\"color\"]").simulate("change", { target: { value: newColor } });
+            const tags = wrapper.state().formData.tags;
+
+            expect(tags[0].color).toEqual(newColor);
+            expect(onChangeHandler).toBeCalled();
         });
 
         it("starting project should update name upon submission", () => {

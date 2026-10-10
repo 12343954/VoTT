@@ -8,6 +8,7 @@ import { IAppSettings } from "../../../../models/applicationState";
 import { ProtectedInput } from "../../common/protectedInput/protectedInput";
 import { CustomField } from "../../common/customField/customField";
 import { generateKey } from "../../../../common/crypto";
+import { isReservedTagHotkey, normalizeTagHotkey } from "../../../../common/tagHotkeys";
 
 // // tslint:disable-next-line:no-var-requires
 // const formSchema = addLocValues(require("./appSettingsForm.json"));
@@ -113,6 +114,24 @@ export class AppSettingsForm extends React.Component<IAppSettingsFormProps, IApp
         if (this.state.classNames.indexOf("was-validated") === -1) {
             this.setState({
                 classNames: [...this.state.classNames, "was-validated"],
+            });
+        }
+
+        if (appSettings.tagHotkeys) {
+            const usedHotkeys = new Set<string>();
+            appSettings.tagHotkeys.forEach((hotkey) => {
+                const normalizedHotkey = normalizeTagHotkey(hotkey);
+                if (!normalizedHotkey) {
+                    return;
+                }
+
+                const key = normalizedHotkey.toUpperCase();
+                if (isReservedTagHotkey(normalizedHotkey)) {
+                    errors.tagHotkeys.addError(`快捷键 ${normalizedHotkey} 已被系统占用`);
+                } else if (usedHotkeys.has(key)) {
+                    errors.tagHotkeys.addError(`快捷键 ${normalizedHotkey} 重复`);
+                }
+                usedHotkeys.add(key);
             });
         }
 

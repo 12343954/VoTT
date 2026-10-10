@@ -3,6 +3,7 @@ import { ObjectDetection } from "../providers/activeLearning/objectDetection";
 import Guard from "../common/guard";
 import { isElectron } from "../common/hostProcess";
 import { Env } from "../common/environment";
+import { getElectronHost } from "../common/electronHost";
 
 export class ActiveLearningService {
     private objectDetection: ObjectDetection;
@@ -98,7 +99,6 @@ export class ActiveLearningService {
     }
 
     private getAppPath = () => {
-        const remote = (window as any).require("electron").remote as Electron.Remote;
-        return remote.app.getAppPath();
+        return getElectronHost().app.getAppPath();
     }
 }

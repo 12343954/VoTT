@@ -1,7 +1,16 @@
 @import './assets/sass/theme.scss';
 
+html,
+body,
+#root {
+    width: 100%;
+    height: 100%;
+}
+
 body {
     user-select: none;
+    margin: 0;
+    scrollbar-color: rgba(255, 255, 255, 0.12) rgba(255, 255, 255, 0.06);
 }
 
 #root {
@@ -19,8 +28,8 @@ input[type=file] {
 
 /* Track */
 ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px $darker-3;
-    background-color: $lighter-1;
+    box-shadow: inset 0 0 4px $darker-4;
+    background-color: rgba(255, 255, 255, 0.06);
     // border-radius: 10px;
 }
 
@@ -28,11 +37,14 @@ input[type=file] {
 ::-webkit-scrollbar-thumb {
     min-height: 30px;
     // border-radius: 10px;
-	background: $lighter-4;
-    box-shadow:  0 0 6px $darker-3;
+	background: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.16);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-	background: $lighter-4;
+	background: rgba(255, 255, 255, 0.09);
 }
 
 .form-group, .object-wrapper {

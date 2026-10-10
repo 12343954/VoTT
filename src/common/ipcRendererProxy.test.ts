@@ -16,10 +16,13 @@ describe("IpcRendererProxy", () => {
             ipcRenderer: {
                 send: jest.fn(),
                 on: jest.fn(),
+                setMaxListeners: jest.fn(),
             },
         };
 
-        (window as any).require = jest.fn(() => electronMock);
+        (window as any).vottElectron = electronMock;
+        (IpcRendererProxy as any).initialized = false;
+        IpcRendererProxy.pending = {};
         expect(Object.keys(IpcRendererProxy.pending).length).toEqual(0);
 
         IpcRendererProxy.send(commandName, args);

@@ -64,10 +64,8 @@ describe("Editor Page Component", () => {
     let projectServiceMock: jest.Mocked<typeof ProjectService> = null;
 
     const electronMock = {
-        remote: {
-            app: {
-                getAppPath: jest.fn(() => ""),
-            },
+        app: {
+            getAppPath: jest.fn(() => ""),
         },
     };
 
@@ -75,7 +73,7 @@ describe("Editor Page Component", () => {
 
     beforeAll(() => {
         registerToolbar();
-        window["require"] = jest.fn(() => electronMock);
+        (window as any).vottElectron = electronMock;
 
         const editorMock = Editor as any;
         editorMock.prototype.addContentSource = jest.fn(() => Promise.resolve());

@@ -6,12 +6,16 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
+        min-width: 0;
+        min-height: 0;
     }
 
     &-main {
         display: flex;
         flex-direction: row;
         flex-grow: 1;
+        min-width: 0;
+        min-height: 0;
     }
 
     &-navbar, &-sidebar {
@@ -72,6 +76,7 @@
         font-size: 20px;
         display: flex;
         flex-direction: column;
+        flex-shrink: 0;
 
         &-fill {
             flex-grow: 1;
@@ -119,6 +124,8 @@
         display: flex;
         flex-direction: column;
         overflow: auto;
+        min-width: 0;
+        min-height: 0;
     }
 }
 

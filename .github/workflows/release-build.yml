@@ -1,0 +1,59 @@
+name: Release Build
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+            target: --win --x64
+          - name: macos-arm64
+            os: macos-15
+            target: --mac --arm64
+          - name: linux-x64
+            os: ubuntu-latest
+            target: --linux --x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.20.2
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run compile
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Build electron assets
+        run: npm run webpack:prod
+
+      - name: Build packages
+        run: npx electron-builder ${{ matrix.target }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vott-${{ matrix.name }}
+          path: releases/*
+          if-no-files-found: error

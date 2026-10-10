@@ -10,6 +10,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { toast } from "react-toastify";
 import { appInfo } from "../../../../common/appInfo";
 import { isElectron } from "../../../../common/hostProcess";
+import { getElectronHost, hasElectronHost } from "../../../../common/electronHost";
 
 /**
  * Props for App Settings Page
@@ -50,6 +51,7 @@ export default class AppSettingsPage extends React.Component<IAppSettingsProps> 
 
         this.toggleDevTools = this.toggleDevTools.bind(this);
         this.reloadApp = this.reloadApp.bind(this);
+        this.openDrawTimingLog = this.openDrawTimingLog.bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onFormCancel = this.onFormCancel.bind(this);
     }
@@ -79,6 +81,11 @@ export default class AppSettingsPage extends React.Component<IAppSettingsProps> 
                                 <p>{strings.appSettings.reload.description}</p>
                                 <button id="refreshApp" className="btn btn-primary btn-sm"
                                     onClick={this.reloadApp}>{strings.appSettings.reload.button}</button>
+                            </div>
+                            <div className="my-3">
+                                <p>打开绘制诊断日志</p>
+                                <button id="openDrawTimingLog" className="btn btn-primary btn-sm"
+                                    onClick={this.openDrawTimingLog}>打开日志</button>
                             </div>
                             <hr />
                             <div className="my-3 mt-3">
@@ -126,6 +133,12 @@ export default class AppSettingsPage extends React.Component<IAppSettingsProps> 
 
     private reloadApp = async () => {
         await this.props.actions.reloadApplication();
+    }
+
+    private openDrawTimingLog = () => {
+        if (hasElectronHost()) {
+            getElectronHost().diagnostics.openDrawTimingLog();
+        }
     }
 
     private switchLanguage = async (e) => {

@@ -20,6 +20,8 @@ export interface ITagInputItemProps {
     tag: ITag;
     /** Index of tag within tags array */
     index: number;
+    /** Keyboard shortcut displayed for this tag */
+    hotkey?: string;
     /** Tag is currently being edited */
     isBeingEdited: boolean;
     /** Tag is currently locked for application */
@@ -179,8 +181,6 @@ export default class TagInputItem extends React.Component<ITagInputItemProps, IT
     }
 
     private getDisplayIndex = () => {
-        const index = this.props.index;
-        const displayIndex = (index === 9) ? 0 : index + 1;
-        return (displayIndex < 10) ? displayIndex : null;
+        return this.props.hotkey || null;
     }
 }

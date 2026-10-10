@@ -47,12 +47,10 @@ describe("TileBar Component", () => {
         close: jest.fn(),
     };
 
-    const electronMock = {
-        remote: {
-            getCurrentWindow: jest.fn(() => electronCurrentWindow),
-            Menu: {
-                getApplicationMenu: jest.fn(() => mockMenu),
-            },
+    const electronMock: any = {
+        currentWindow: electronCurrentWindow,
+        menu: {
+            getApplicationMenu: jest.fn(() => mockMenu),
         },
     };
 
@@ -73,15 +71,16 @@ describe("TileBar Component", () => {
 
     beforeEach(() => {
         handlerMapping = {};
-        wrapper = createComponent();
     });
 
     describe("Web", () => {
-        beforeAll(() => {
-            window["require"] = undefined;
+        beforeEach(() => {
+            (window as any).vottElectron = undefined;
             Object.defineProperty(global.process, "platform", {
+                configurable: true,
                 value: undefined,
             });
+            wrapper = createComponent();
         });
 
         it("renders ico, title and children", () => {
@@ -97,15 +96,14 @@ describe("TileBar Component", () => {
     });
 
     describe("Electron", () => {
-        beforeAll(() => {
-            window["require"] = jest.fn(() => electronMock);
-        });
-
         describe("Windows", () => {
-            beforeAll(() => {
+            beforeEach(() => {
+                (window as any).vottElectron = electronMock;
                 Object.defineProperty(global.process, "platform", {
+                    configurable: true,
                     value: "win32",
                 });
+                wrapper = createComponent();
             });
 
             it("renders icon, menu, title, children and window controls", () => {
@@ -224,10 +222,13 @@ describe("TileBar Component", () => {
         });
 
         describe("MacOS", () => {
-            beforeAll(() => {
+            beforeEach(() => {
+                (window as any).vottElectron = electronMock;
                 Object.defineProperty(global.process, "platform", {
+                    configurable: true,
                     value: "darwin",
                 });
+                wrapper = createComponent();
             });
 
             it("renders title and children", () => {
@@ -242,10 +243,13 @@ describe("TileBar Component", () => {
         });
 
         describe("Linux", () => {
-            beforeAll(() => {
+            beforeEach(() => {
+                (window as any).vottElectron = electronMock;
                 Object.defineProperty(global.process, "platform", {
+                    configurable: true,
                     value: "linux",
                 });
+                wrapper = createComponent();
             });
 
             it("renders title and children", () => {

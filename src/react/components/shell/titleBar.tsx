@@ -1,9 +1,9 @@
-import React, { Fragment } from "react";
+import React from "react";
 import Menu, { MenuItem, SubMenu, Divider } from "rc-menu";
-import { PlatformType } from "../../../common/hostProcess";
+import { getHostPlatform, PlatformType } from "../../../common/hostProcess";
 import "./titleBar.scss";
 import { strings } from "../../../common/strings";
-import { HelpMenu } from "./helpMenu";
+import { getElectronHost, hasElectronHost, IElectronHost } from "../../../common/electronHost";
 
 export interface ITitleBarProps extends React.Props<TitleBar> {
     icon?: string | JSX.Element;
@@ -21,33 +21,31 @@ export interface ITitleBarState {
 export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
     public state: ITitleBarState = {
         isElectron: false,
-        platform: global && global.process && global.process.platform ? global.process.platform : "web",
+        platform: getHostPlatform(),
         maximized: false,
         fullscreen: false,
         menu: null,
     };
 
     private menu: Menu = React.createRef();
-    private remote: Electron.Remote;
-    private currentWindow: Electron.BrowserWindow;
+    private electronHost: IElectronHost;
 
     public componentDidMount() {
-        const isElectron: boolean = !!window["require"];
+        const isElectron: boolean = hasElectronHost();
 
         if (isElectron) {
-            this.remote = (window as any).require("electron").remote as Electron.Remote;
-            this.currentWindow = this.remote.getCurrentWindow();
+            this.electronHost = getElectronHost();
 
-            this.currentWindow.on("maximize", () => this.onMaximize(true));
-            this.currentWindow.on("unmaximize", () => this.onMaximize(false));
-            this.currentWindow.on("enter-full-screen", () => this.onFullScreen(true));
-            this.currentWindow.on("leave-full-screen", () => this.onFullScreen(false));
+            this.electronHost.currentWindow.on("maximize", () => this.onMaximize(true));
+            this.electronHost.currentWindow.on("unmaximize", () => this.onMaximize(false));
+            this.electronHost.currentWindow.on("enter-full-screen", () => this.onFullScreen(true));
+            this.electronHost.currentWindow.on("leave-full-screen", () => this.onFullScreen(false));
 
             this.setState({
                 isElectron: true,
-                maximized: this.currentWindow.isMaximized(),
-                fullscreen: this.currentWindow.isFullScreen(),
-                menu: this.remote.Menu.getApplicationMenu(),
+                maximized: this.electronHost.currentWindow.isMaximized(),
+                fullscreen: this.electronHost.currentWindow.isFullScreen(),
+                menu: this.electronHost.menu.getApplicationMenu(),
             });
         }
     }
@@ -181,7 +179,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
 
     private onMenuItemClick(e: any, menuItem: Electron.MenuItem) {
         if (menuItem.click) {
-            menuItem.click.call(menuItem, menuItem, this.currentWindow);
+            menuItem.click.call(menuItem, menuItem, this.electronHost.currentWindow);
         }
 
         this.setState({ menu: { ...this.state.menu } as Electron.Menu });
@@ -189,24 +187,24 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
 
     private syncTitle = (): void => {
         if (this.state.isElectron) {
-            this.currentWindow.setTitle(`${this.props.title} - VoTT`);
+            this.electronHost.currentWindow.setTitle(`${this.props.title} - VoTT`);
         }
     }
 
     private minimizeWindow = () => {
-        this.currentWindow.minimize();
+        this.electronHost.currentWindow.minimize();
     }
 
     private maximizeWindow = () => {
-        this.currentWindow.maximize();
+        this.electronHost.currentWindow.maximize();
     }
 
     private unmaximizeWindow = () => {
-        this.currentWindow.unmaximize();
+        this.electronHost.currentWindow.unmaximize();
     }
 
     private closeWindow = () => {
-        this.currentWindow.close();
+        this.electronHost.currentWindow.close();
     }
 
     private onMenuItemSelected = (key: string, item: React.Component) => {

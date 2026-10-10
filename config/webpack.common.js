@@ -5,7 +5,10 @@ module.exports = {
         __dirname: false,
     },
     target: "electron-main",
-    entry: "./src/electron/main.ts",
+    entry: {
+        main: "./src/electron/main.ts",
+        preload: "./src/electron/preload.ts",
+    },
     module: {
         rules: [
             {
@@ -26,7 +29,7 @@ module.exports = {
         extensions: [".ts", ".js"]
     },
     output: {
-        filename: "main.js",
+        filename: "[name].js",
         path: path.resolve(__dirname, "../build")
     }
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import Form, { FormValidation, ISubmitEvent, IChangeEvent, Widget } from "react-jsonschema-form";
-import { ITagsInputProps, TagEditorModal, TagsInput } from "vott-react";
+import { TagEditorModal } from "vott-react";
 import { addLocValues, strings } from "../../../../common/strings";
 import { IConnection, IProject, ITag, IAppSettings } from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
@@ -12,6 +12,7 @@ import "vott-react/dist/css/tagsInput.css";
 import Checkbox from "rc-checkbox";
 import { IConnectionProviderPickerProps } from "../../common/connectionProviderPicker/connectionProviderPicker";
 import LocalFolderPicker from "../../common/localFolderPicker/localFolderPicker";
+import ProjectTagInput from "./projectTagInput";
 
 // // tslint:disable-next-line:no-var-requires
 // const formSchema = addLocValues(require("./projectForm.json"));
@@ -62,7 +63,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         })),
     };
 
-    private tagsInput: React.RefObject<TagsInput>;
+    private tagsInput: React.RefObject<ProjectTagInput>;
     private tagEditorModal: React.RefObject<TagEditorModal>;
 
     // tslint:disable-next-line:no-var-requires
@@ -80,7 +81,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                 ...this.props.project,
             },
         };
-        this.tagsInput = React.createRef<TagsInput>();
+        this.tagsInput = React.createRef<ProjectTagInput>();
         this.tagEditorModal = React.createRef<TagEditorModal>();
 
         this.onFormSubmit = this.onFormSubmit.bind(this);
@@ -174,7 +175,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                     onChange: props.onChange,
                 };
             }),
-            tagsInput: CustomField<ITagsInputProps>(TagsInput, (props) => {
+            tagsInput: CustomField<any>(ProjectTagInput, (props) => {
                 return {
                     tags: props.formData,
                     onChange: props.onChange,

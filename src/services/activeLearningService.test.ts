@@ -15,15 +15,13 @@ describe("Active Learning Service", () => {
     let activeLearningService: ActiveLearningService = null;
 
     const electronMock = {
-        remote: {
-            app: {
-                getAppPath: jest.fn(),
-            },
+        app: {
+            getAppPath: jest.fn(),
         },
     };
 
     beforeAll(() => {
-        window["require"] = jest.fn(() => electronMock);
+        (window as any).vottElectron = electronMock;
     });
 
     beforeEach(() => {

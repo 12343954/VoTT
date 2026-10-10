@@ -68,6 +68,44 @@ describe("Layout Utils", () => {
             });
         });
 
+        it("creates scaled-up bounding box for small landscape image", () => {
+            const contentSource: IGenericContentSource = {
+                offsetWidth: 1200,
+                offsetHeight: 800,
+                offsetTop: 0,
+                offsetLeft: 0,
+                width: 225,
+                height: 225,
+            };
+
+            const result = createContentBoundingBox(contentSource);
+            expect(result).toEqual({
+                width: 800,
+                height: 800,
+                top: 0,
+                left: 200,
+            });
+        });
+
+        it("creates scaled-up bounding box for small portrait image", () => {
+            const contentSource: IGenericContentSource = {
+                offsetWidth: 1200,
+                offsetHeight: 800,
+                offsetTop: 0,
+                offsetLeft: 0,
+                width: 225,
+                height: 300,
+            };
+
+            const result = createContentBoundingBox(contentSource);
+            expect(result).toEqual({
+                width: 600,
+                height: 800,
+                top: 0,
+                left: 300,
+            });
+        });
+
         it("creates portrait sized bounding box for landscape image", () => {
             const contentSource: IGenericContentSource = {
                 offsetWidth: 1000,

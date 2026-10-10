@@ -1,4 +1,5 @@
 import os from "os";
+import { getElectronPlatform, hasElectronHost } from "./electronHost";
 
 /**
  * @name - Host Process
@@ -29,6 +30,13 @@ export enum PlatformType {
 }
 
 function getHostProcess(): IHostProcess {
+    if (hasElectronHost()) {
+        return {
+            release: "electron",
+            type: HostProcessType.Electron,
+        };
+    }
+
     const osRelease = os.release().toLowerCase();
     let hostProcessType: HostProcessType;
     if (osRelease.indexOf("electron") > -1 || process.env.HOST_TYPE === "electron") {
@@ -49,6 +57,15 @@ export function isElectron(): boolean {
 
 export function isBrowser(): boolean {
     return getHostProcess().type === HostProcessType.Browser;
+}
+
+export function getHostPlatform(): string {
+    const electronPlatform = getElectronPlatform();
+    if (electronPlatform) {
+        return electronPlatform;
+    }
+
+    return global && global.process && global.process.platform ? global.process.platform : PlatformType.Web;
 }
 
 export default getHostProcess;

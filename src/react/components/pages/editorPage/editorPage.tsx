@@ -8,6 +8,7 @@ import shortid from "shortid";
 import { SelectionMode } from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
 import { strings } from "../../../../common/strings";
+import { DEFAULT_TAG_HOTKEYS, getTagHotkeyRegistrations, getTagHotkeys, getTagIndexFromHotkeys } from "../../../../common/tagHotkeys";
 import {
     AssetState, AssetType, EditorMode, IApplicationState,
     IAppSettings, IAsset, IAssetMetadata, IProject, IRegion,
@@ -36,6 +37,17 @@ import { ActiveLearningService } from "../../../../services/activeLearningServic
 import { toast } from "react-toastify";
 
 import Yolov3Service from '../../../../services/yolov3Service'
+
+const MIN_THUMBNAIL_WIDTH = 175;
+const MAX_THUMBNAIL_WIDTH = 400;
+
+function normalizeThumbnailSize(size: ISize): ISize {
+    const width = Math.max(MIN_THUMBNAIL_WIDTH, Math.min(MAX_THUMBNAIL_WIDTH, size.width));
+    return {
+        width,
+        height: width / (4 / 3),
+    };
+}
 
 /**
  * Properties for Editor Page
@@ -123,7 +135,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             videoSettings: (this.props.project) ? this.props.project.videoSettings : null,
             activeLearningSettings: (this.props.project) ? this.props.project.activeLearningSettings : null,
         },
-        thumbnailSize: this.props.appSettings.thumbnailSize || { width: 175, height: 155 },
+        thumbnailSize: normalizeThumbnailSize(this.props.appSettings.thumbnailSize || {
+            width: MIN_THUMBNAIL_WIDTH,
+            height: MIN_THUMBNAIL_WIDTH / (4 / 3),
+        }),
         isValid: true,
         showInvalidRegionWarning: false,
         searchWord: '',
@@ -141,6 +156,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private yolov3Service: Yolov3Service = null;
     //smith add 2024-4-8
     private totalAssets: IAsset[] = [];
+    private saveAssetMetadataTimer: number = null;
+    private saveAssetMetadataGeneration = 0;
 
     public async componentDidMount() {
         this.refreshToolbars();
@@ -155,6 +172,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
         this.yolov3Service = new Yolov3Service(this.props.project.autoDetectApi ? this.props.project.autoDetectApi : "");
+    }
+
+    public componentWillUnmount() {
+        if (this.saveAssetMetadataTimer) {
+            window.clearTimeout(this.saveAssetMetadataTimer);
+            this.saveAssetMetadataTimer = null;
+        }
     }
 
     private refreshToolbars() {
@@ -205,31 +229,36 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             return (<div>Loading...</div>);
         }
 
+        const tagHotkeys = getTagHotkeys(this.props.appSettings);
+        const tagHotkeyRegistrations = getTagHotkeyRegistrations(this.props.appSettings);
+
         return (
             <div className="editor-page">
-                {[...Array(10).keys()].map((index) => {
+                {tagHotkeyRegistrations.map((registration) => {
                     return (<KeyboardBinding
                         displayName={strings.editorPage.tags.hotKey.apply}
-                        key={index}
+                        key={`tag-${registration.index}-${registration.hotkey}`}
                         keyEventType={KeyEventType.KeyDown}
-                        accelerators={[`${index}`]}
+                        accelerators={registration.accelerators}
                         icon={"fa-tag"}
                         handler={this.handleTagHotKey} />);
                 })}
-                {[...Array(10).keys()].map((index) => {
+                {DEFAULT_TAG_HOTKEYS.map((hotkey) => {
                     return (<KeyboardBinding
                         displayName={strings.editorPage.tags.hotKey.lock}
-                        key={index}
+                        key={`lock-${hotkey}`}
                         keyEventType={KeyEventType.KeyDown}
-                        accelerators={[`CmdOrCtrl+${index}`]}
+                        accelerators={[`CmdOrCtrl+${hotkey}`]}
                         icon={"fa-lock"}
                         handler={this.handleCtrlTagHotKey} />);
                 })}
                 <SplitPane split="vertical"
                     defaultSize={this.state.thumbnailSize.width}
-                    minSize={100}
-                    maxSize={400}
+                    minSize={MIN_THUMBNAIL_WIDTH}
+                    maxSize={MAX_THUMBNAIL_WIDTH}
                     paneStyle={{ display: "flex" }}
+                    pane1Style={{ minWidth: MIN_THUMBNAIL_WIDTH, overflow: "hidden" }}
+                    pane2Style={{ minWidth: 0, overflow: "hidden" }}
                     onChange={this.onSideBarResize}
                     onDragFinished={this.onSideBarResizeComplete}>
                     <div className="editor-page-sidebar bg-lighter-1">
@@ -286,6 +315,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 onCtrlTagClick={this.onCtrlTagClicked}
                                 onTagRenamed={this.confirmTagRenamed}
                                 onTagDeleted={this.confirmTagDeleted}
+                                tagHotkeys={tagHotkeys}
                             />
                         </div>
                         <Confirm title={strings.editorPage.tags.rename.title}
@@ -392,11 +422,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onSideBarResize = (newWidth: number) => {
         this.setState({
-            thumbnailSize: {
+            thumbnailSize: normalizeThumbnailSize({
                 width: newWidth,
                 height: newWidth / (4 / 3),
-            },
-        }, () => this.canvas.current.forceResize());
+            }),
+        }, () => {
+            if (this.canvas.current) {
+                this.canvas.current.forceResize();
+            }
+        });
     }
 
     /**
@@ -474,22 +508,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private getTagFromKeyboardEvent = (event: KeyboardEvent): ITag => {
-        let key = parseInt(event.key, 10);
-        if (isNaN(key)) {
-            try {
-                key = parseInt(event.key.split("+")[1], 10);
-            } catch (e) {
-                return;
-            }
-        }
-        let index: number;
+        const index = getTagIndexFromHotkeys(getTagHotkeys(this.props.appSettings), event.key);
         const tags = this.props.project.tags;
-        if (key === 0 && tags.length >= 10) {
-            index = 9;
-        } else if (key < 10) {
-            index = key - 1;
-        }
-        if (index < tags.length) {
+        if (index >= 0 && index < tags.length) {
             return tags[index];
         }
         return null;
@@ -507,7 +528,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private handleCtrlTagHotKey = (event: KeyboardEvent): void => {
-        const tag = this.getTagFromKeyboardEvent(event);
+        const index = getTagIndexFromHotkeys(DEFAULT_TAG_HOTKEYS, event.key);
+        const tag = index >= 0 && index < this.props.project.tags.length ? this.props.project.tags[index] : null;
         if (tag) {
             this.onCtrlTagClicked(tag);
         }
@@ -555,32 +577,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             assetMetadata.asset.state = AssetState.Visited;
         }
 
-        // Update root asset if not already in the "Tagged" state
-        // This is primarily used in the case where a Video Frame is being edited.
-        // We want to ensure that in this case the root video asset state is accurately
-        // updated to match that state of the asset.
         if (rootAsset.id === assetMetadata.asset.id) {
             rootAsset.state = assetMetadata.asset.state;
         } else {
-            const rootAssetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, rootAsset);
-
-            if (rootAssetMetadata.asset.state !== AssetState.Tagged) {
-                rootAssetMetadata.asset.state = assetMetadata.asset.state;
-                await this.props.actions.saveAssetMetadata(this.props.project, rootAssetMetadata);
-            }
-
-            rootAsset.state = rootAssetMetadata.asset.state;
+            rootAsset.state = assetMetadata.asset.state;
         }
-
-        // Only update asset metadata if state changes or is different
-        if (initialState !== assetMetadata.asset.state || this.state.selectedAsset !== assetMetadata) {
-            if (!assetMetadata.creator && this.props.user) assetMetadata.creator = this.props.user.account;
-            if (!assetMetadata.createdDate) assetMetadata.createdDate = new Date().valueOf();
-
-            await this.props.actions.saveAssetMetadata(this.props.project, assetMetadata);
-        }
-
-        await this.props.actions.saveProject(this.props.project);
 
         const assetService = new AssetService(this.props.project);
         const childAssets = assetService.getChildAssets(rootAsset);
@@ -597,6 +598,61 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         this.setState({ childAssets, assets, isValid: true });
+        this.queueAssetMetadataSave(assetMetadata, rootAsset, initialState);
+    }
+
+    private queueAssetMetadataSave = (
+        assetMetadata: IAssetMetadata,
+        rootAsset: IAsset,
+        initialState: AssetState,
+    ): void => {
+        if (this.saveAssetMetadataTimer) {
+            window.clearTimeout(this.saveAssetMetadataTimer);
+        }
+
+        const generation = ++this.saveAssetMetadataGeneration;
+        window.requestAnimationFrame(() => {
+            if (generation !== this.saveAssetMetadataGeneration) {
+                return;
+            }
+
+            this.saveAssetMetadataTimer = window.setTimeout(() => {
+                if (generation !== this.saveAssetMetadataGeneration) {
+                    return;
+                }
+
+                this.saveAssetMetadataTimer = null;
+                this.persistAssetMetadataChange(assetMetadata, rootAsset, initialState);
+            }, 0);
+        });
+    }
+
+    private persistAssetMetadataChange = async (
+        assetMetadata: IAssetMetadata,
+        rootAsset: IAsset,
+        initialState: AssetState,
+    ): Promise<void> => {
+        try {
+            if (rootAsset.id !== assetMetadata.asset.id) {
+                const rootAssetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, rootAsset);
+
+                if (rootAssetMetadata.asset.state !== AssetState.Tagged) {
+                    rootAssetMetadata.asset.state = assetMetadata.asset.state;
+                    await this.props.actions.saveAssetMetadata(this.props.project, rootAssetMetadata);
+                }
+            }
+
+            if (initialState !== assetMetadata.asset.state || this.state.selectedAsset !== assetMetadata) {
+                if (!assetMetadata.creator && this.props.user) assetMetadata.creator = this.props.user.account;
+                if (!assetMetadata.createdDate) assetMetadata.createdDate = new Date().valueOf();
+
+                await this.props.actions.saveAssetMetadata(this.props.project, assetMetadata);
+            }
+
+            await this.props.actions.saveProject(this.props.project);
+        } catch (error) {
+            console.warn(error);
+        }
     }
 
     /**

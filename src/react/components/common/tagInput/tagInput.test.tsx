@@ -36,8 +36,10 @@ describe("Tag Input Component", () => {
         const props: ITagInputProps = createProps();
         const wrapper = createComponent(props);
         wrapper.find(".tag-color").first().simulate("click");
-        expect(props.onTagClick).toBeCalledWith(props.tags[0]);
         expect(wrapper.state().clickedColor).toBe(true);
+        expect(wrapper.state().showColorPicker).toBe(true);
+        expect(wrapper.state().editingTag).toEqual(props.tags[0]);
+        expect(props.onTagClick).not.toBeCalled();
         expect(props.onCtrlTagClick).not.toBeCalled();
     });
 
@@ -182,7 +184,6 @@ describe("Tag Input Component", () => {
             expect(wrapper.exists("div.color-picker")).toBe(false);
             wrapper.find("div.tag-color").first().simulate("click");
             expect(wrapper.state().clickedColor).toBe(true);
-            wrapper.find("div.tag-input-toolbar-item.edit").simulate("click");
             expect(wrapper.state().showColorPicker).toBe(true);
             expect(wrapper.state().editingTag).toEqual(tags[0]);
             expect(wrapper.exists("div.color-picker")).toBe(true);
