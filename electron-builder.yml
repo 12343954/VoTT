@@ -30,5 +30,6 @@ linux:
     - zip
 publish: null
 electronVersion: 22.3.27
+npmRebuild: false
 extraFiles:
   - "cocoSSDModel"
