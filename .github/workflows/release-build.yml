@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vott-${{ matrix.name }}
-          path: releases/*
+          path: releases/*.*
           if-no-files-found: error
 
   release:
