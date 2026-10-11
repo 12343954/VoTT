@@ -12,3 +12,45 @@
         flex-basis: 30vw;
     }
 }
+
+.app-settings-shortcuts {
+    font-size: 13px;
+}
+
+.app-settings-shortcuts-section {
+    margin-bottom: 12px;
+
+    h6 {
+        margin: 8px 0 6px;
+        color: #f2f4f6;
+        font-size: 13px;
+        font-weight: 600;
+    }
+}
+
+.app-settings-shortcut-row {
+    display: grid;
+    grid-template-columns: minmax(96px, 42%) minmax(0, 1fr);
+    gap: 8px;
+    align-items: baseline;
+    padding: 2px 0;
+}
+
+.app-settings-shortcut-keys {
+    color: #f7f7f7;
+    font-family: Consolas, Monaco, monospace;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.app-settings-shortcut-description,
+.app-settings-shortcut-hint,
+.app-settings-shortcut-empty {
+    color: #cfd3d7;
+}
+
+.app-settings-shortcut-hint,
+.app-settings-shortcut-empty {
+    margin-top: 6px;
+    font-size: 12px;
+}

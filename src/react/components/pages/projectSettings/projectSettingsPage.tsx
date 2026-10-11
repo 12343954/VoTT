@@ -58,7 +58,7 @@ const projectFormKey = "projectForm";
 @connect(mapStateToProps, mapDispatchToProps)
 export default class ProjectSettingsPage extends React.Component<IProjectSettingsPageProps, IProjectSettingsPageState> {
     public state: IProjectSettingsPageState = {
-        project: this.props.project,
+        project: this.getCreateProjectDefaults(this.props.project),
     };
 
     public async componentDidMount() {
@@ -84,7 +84,7 @@ export default class ProjectSettingsPage extends React.Component<IProjectSetting
 
     public componentDidUpdate(prevProps: Readonly<IProjectSettingsPageProps>) {
         if (prevProps.project !== this.props.project) {
-            this.setState({ project: this.props.project });
+            this.setState({ project: this.getCreateProjectDefaults(this.props.project) });
         }
     }
 
@@ -129,27 +129,32 @@ export default class ProjectSettingsPage extends React.Component<IProjectSetting
     }
 
     private onFormSubmit = async (project: IProject) => {
-        const isNew = !(!!project.id);
-
         if (project.useSecurityToken) {
             await this.props.applicationActions.ensureSecurityToken(project);
         }
 
-        await this.props.projectActions.saveProject(project);
+        const savedProject = await this.props.projectActions.saveProject(project);
         localStorage.removeItem(projectFormKey);
 
         toast.success(interpolate(strings.projectSettings.messages.saveSuccess, { project }));
 
-        if (isNew) {
-            this.props.history.push(`/projects/${this.props.project.id}/edit`);
-        } else {
-            this.props.history.goBack();
-        }
+        this.props.history.push(`/projects/${savedProject.id}/settings`);
     }
 
     private onFormCancel = () => {
         localStorage.removeItem(projectFormKey);
         this.props.history.goBack();
+    }
+
+    private getCreateProjectDefaults(project: IProject): IProject {
+        if (this.props.match.url === "/projects/create" && project && !project.id) {
+            return {
+                ...project,
+                useSecurityToken: false,
+            };
+        }
+
+        return project;
     }
 
     /**

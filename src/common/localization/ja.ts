@@ -21,6 +21,7 @@ export const japanese: IAppStrings = {
         maximize: "最大化", // Maximize,
         restore: "戻す", // Restore,
         close: "閉じる", // Close"
+        fullscreenExitHint: "Esc キーで全画面を終了",
     },
     homePage: {
         newProject: "新規プロジェクト", // New Project,
@@ -100,6 +101,44 @@ export const japanese: IAppStrings = {
             description: "現在の変更をすべて破棄して、アプリをリロード", // Reload the app discarding all current changes,
             button: "アプリケーションをリフレッシュ", // Refresh Application"
         },
+        drawLog: {
+            description: "描画診断ログを開く",
+            button: "ログを開く",
+        },
+        errorLog: {
+            description: "エラー診断ログを開く",
+            button: "ログを開く",
+        },
+        shortcuts: {
+            title: "キーボード ショートカット",
+            annotation: "注釈",
+            projectManagement: "プロジェクト管理",
+            application: "アプリケーション",
+            projectTags: "プロジェクト タグ",
+            defaultSequence: "既定の順序",
+            lockHint: "Ctrl キーを押しながらタグのショートカットを押すと、そのタグをロックします。",
+            selectTool: "選択ツール",
+            drawRectangle: "四角形を描画",
+            drawPolygon: "ポリゴンを描画",
+            runAiDetection: "AI 検出を実行",
+            copyRectangle: "四角形をコピー",
+            copyRegions: "領域をコピー",
+            cutRegions: "領域を切り取り",
+            pasteRegions: "領域を貼り付け",
+            removeAllRegions: "すべての領域を削除",
+            videoStepBack: "ビデオを戻す",
+            videoStepForward: "ビデオを進める",
+            previousAsset: "前のアセット",
+            nextAsset: "次のアセット",
+            saveProject: "プロジェクトを保存",
+            exportProject: "プロジェクトをエクスポート",
+            activeLearning: "アクティブ ラーニング",
+            help: "ヘルプ",
+            reloadApplication: "アプリケーションを再読み込み",
+            toggleDeveloperTools: "開発者ツールを切り替え",
+            toggleFullScreen: "全画面を切り替え",
+            exitFullScreen: "全画面を終了",
+        },
         language: {
             description: "UI 言語"
         },
@@ -161,6 +200,7 @@ export const japanese: IAppStrings = {
         modal: {
             name: "タグ名", // Tag Name,
             color: "タグの色", // Tag Color"
+            shortcut: "ショートカット",
         },
         colors: {
             white: "白",  // White,
@@ -182,6 +222,11 @@ export const japanese: IAppStrings = {
             existingName: "タグ名が既に存在します。別の名前を選んでください",  // Tag name already exists. Choose another name,
             emptyName: "空のタグ名を持つことはできません", // Cannot have an empty tag name,
             unknownTagName: "不明",  // Unknown"
+            nameExists: "タグ名 ${name} は既に存在します",
+            shortcutReserved: "ショートカット ${hotkey} はシステムで予約されています",
+            shortcutDuplicate: "ショートカット ${hotkey} は別のタグで使用されています",
+            shortcutTooltip: "ショートカット: ${hotkey}",
+            editTooltip: "クリックして色とショートカットを設定",
         },
         toolbar: {
             add: "新しいタグを追加", // Add new tag,

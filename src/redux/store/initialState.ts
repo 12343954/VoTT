@@ -1,6 +1,5 @@
 import { IAppSettings, IApplicationState } from "../../models/applicationState";
 import { strings } from "../../common/strings";
-import { DEFAULT_TAG_HOTKEYS } from "../../common/tagHotkeys";
 
 const appSettings: IAppSettings = JSON.parse(localStorage.getItem('appSettings'));
 
@@ -19,7 +18,6 @@ const initialState: IApplicationState = {
         language: appSettings ? (appSettings.language || "en") : "en",
         devToolsEnabled: false,
         securityTokens: [],
-        tagHotkeys: appSettings ? (appSettings.tagHotkeys || DEFAULT_TAG_HOTKEYS) : DEFAULT_TAG_HOTKEYS,
     },
     connections: [],
     recentProjects: [],

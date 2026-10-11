@@ -28,6 +28,7 @@ export interface IAppStrings {
         maximize: string;
         restore: string;
         close: string;
+        fullscreenExitHint: string;
     };
     homePage: {
         newProject: string;
@@ -104,6 +105,44 @@ export interface IAppStrings {
             description: string;
             button: string;
         },
+        drawLog: {
+            description: string;
+            button: string;
+        },
+        errorLog: {
+            description: string;
+            button: string;
+        },
+        shortcuts: {
+            title: string;
+            annotation: string;
+            projectManagement: string;
+            application: string;
+            projectTags: string;
+            defaultSequence: string;
+            lockHint: string;
+            selectTool: string;
+            drawRectangle: string;
+            drawPolygon: string;
+            runAiDetection: string;
+            copyRectangle: string;
+            copyRegions: string;
+            cutRegions: string;
+            pasteRegions: string;
+            removeAllRegions: string;
+            videoStepBack: string;
+            videoStepForward: string;
+            previousAsset: string;
+            nextAsset: string;
+            saveProject: string;
+            exportProject: string;
+            activeLearning: string;
+            help: string;
+            reloadApplication: string;
+            toggleDeveloperTools: string;
+            toggleFullScreen: string;
+            exitFullScreen: string;
+        },
         language: {
             description: string;
         },
@@ -164,6 +203,7 @@ export interface IAppStrings {
         modal: {
             name: string;
             color: string;
+            shortcut: string;
         }
         toolbar: {
             add: string;
@@ -194,6 +234,11 @@ export interface IAppStrings {
             existingName: string;
             emptyName: string;
             unknownTagName: string;
+            nameExists: string;
+            shortcutReserved: string;
+            shortcutDuplicate: string;
+            shortcutTooltip: string;
+            editTooltip: string;
         }
     };
     connections: {

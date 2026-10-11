@@ -1,5 +1,19 @@
 @import '../../../assets/sass/theme.scss';
 
+.fullscreen-exit-hint {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    z-index: 10000;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.72);
+    color: #fff;
+    font-size: 13px;
+    pointer-events: none;
+}
+
 .platform-web, .platform-win32 {
     .title-bar {
         min-height: 34px;

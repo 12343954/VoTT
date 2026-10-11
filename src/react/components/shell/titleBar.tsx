@@ -40,6 +40,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
             this.electronHost.currentWindow.on("unmaximize", () => this.onMaximize(false));
             this.electronHost.currentWindow.on("enter-full-screen", () => this.onFullScreen(true));
             this.electronHost.currentWindow.on("leave-full-screen", () => this.onFullScreen(false));
+            window.addEventListener("keydown", this.onKeyDown);
 
             this.setState({
                 isElectron: true,
@@ -50,6 +51,10 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
         }
     }
 
+    public componentWillUnmount() {
+        window.removeEventListener("keydown", this.onKeyDown);
+    }
+
     public componentDidUpdate(prevProps: Readonly<ITitleBarProps>) {
         if (this.props.title !== prevProps.title) {
             this.syncTitle();
@@ -58,7 +63,11 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
 
     public render() {
         if (this.state.fullscreen) {
-            return null;
+            return (
+                <div className="fullscreen-exit-hint">
+                    {strings.titleBar.fullscreenExitHint}
+                </div>
+            );
         }
 
         return (
@@ -122,6 +131,14 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
         this.setState({
             fullscreen: isFullScreen,
         });
+    }
+
+    private onKeyDown = (event: KeyboardEvent) => {
+        if (this.state.fullscreen && event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            this.electronHost.currentWindow.setFullScreen(false);
+        }
     }
 
     private renderMenu = (menu: Electron.Menu) => {

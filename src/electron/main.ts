@@ -19,8 +19,45 @@ let electronHostBridgeRegistered = false;
 let menuClickId = 0;
 let menuClickHandlers: { [id: string]: Electron.MenuItem } = {};
 
+function getLogDirectory(): string {
+    try {
+        return app.getPath("userData");
+    } catch (error) {
+        return process.cwd();
+    }
+}
+
 function getDrawTimingLogPath(): string {
-    return path.join(app.getPath("userData"), "vott-draw-timing.log");
+    return path.join(getLogDirectory(), "vott-draw-timing.log");
+}
+
+function getErrorLogPath(): string {
+    return path.join(getLogDirectory(), "vott-error.log");
+}
+
+function serializeError(error: any): object {
+    if (!error) {
+        return { message: String(error) };
+    }
+
+    return {
+        name: error.name,
+        message: error.message || String(error),
+        stack: error.stack,
+    };
+}
+
+function writeErrorLog(label: string, data: object = {}): void {
+    try {
+        fs.appendFileSync(getErrorLogPath(), `${JSON.stringify({
+            label,
+            process: "main",
+            time: new Date().toISOString(),
+            ...data,
+        })}\n`);
+    } catch (error) {
+        console.warn(error);
+    }
 }
 
 function writeDrawTimingLog(entry: object): void {
@@ -43,6 +80,14 @@ function logMainTiming(label: string, data: object = {}): void {
         ...data,
     });
 }
+
+process.on("uncaughtException", (error) => {
+    writeErrorLog("main-uncaught-exception", { error: serializeError(error) });
+});
+
+process.on("unhandledRejection", (reason) => {
+    writeErrorLog("main-unhandled-rejection", { reason: serializeError(reason) });
+});
 
 function createWindow() {
     logMainTiming("create-window-enter", {
@@ -79,6 +124,12 @@ function createWindow() {
     }
 
     mainWindow = new BrowserWindow(windowOptions);
+    mainWindow.webContents.on("render-process-gone", (event, details) => {
+        writeErrorLog("renderer-process-gone", { details });
+    });
+    mainWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL) => {
+        writeErrorLog("renderer-did-fail-load", { errorCode, errorDescription, validatedURL });
+    });
     registerElectronHostBridge();
     registerWindowStateEvents(mainWindow);
     mainWindow.loadURL(staticUrl);
@@ -136,6 +187,13 @@ function registerElectronHostBridge() {
         }
     });
 
+    ipcMain.on("vott:set-full-screen", (event, isFullScreen: boolean) => {
+        const browserWindow = BrowserWindow.fromWebContents(event.sender);
+        if (browserWindow) {
+            browserWindow.setFullScreen(Boolean(isFullScreen));
+        }
+    });
+
     ipcMain.on("vott:window-command", (event, command: string) => {
         const browserWindow = BrowserWindow.fromWebContents(event.sender);
         if (!browserWindow) {
@@ -167,12 +225,36 @@ function registerElectronHostBridge() {
         const menuItem = menuClickHandlers[clickId];
         if (menuItem && menuItem.click) {
             const browserWindow = BrowserWindow.fromWebContents(event.sender) || mainWindow;
-            menuItem.click.call(menuItem, menuItem, browserWindow, event);
+            const role = normalizeMenuRole(menuItem["role"]);
+            writeErrorLog("menu-click", {
+                clickId,
+                enabled: menuItem.enabled,
+                label: menuItem.label,
+                role,
+                type: menuItem["type"],
+            });
+            try {
+                if (!executeMenuRole(role, browserWindow)) {
+                    menuItem.click.call(menuItem, menuItem, browserWindow);
+                }
+            } catch (error) {
+                writeErrorLog("menu-click-error", {
+                    clickId,
+                    label: menuItem.label,
+                    role,
+                    error: serializeError(error),
+                });
+                throw error;
+            }
         }
     });
 
     ipcMain.on("vott:get-draw-timing-log-path", (event) => {
         event.returnValue = getDrawTimingLogPath();
+    });
+
+    ipcMain.on("vott:get-error-log-path", (event) => {
+        event.returnValue = getErrorLogPath();
     });
 
     ipcMain.on("vott:clear-draw-timing-log", () => {
@@ -199,6 +281,13 @@ function registerElectronHostBridge() {
         });
     });
 
+    ipcMain.on("vott:error-log", (event, entry: object) => {
+        writeErrorLog("renderer-error", {
+            entry,
+            url: event.sender.getURL(),
+        });
+    });
+
     ipcMain.on("vott:open-draw-timing-log", () => {
         const logPath = getDrawTimingLogPath();
         fs.closeSync(fs.openSync(logPath, "a"));
@@ -209,6 +298,50 @@ function registerElectronHostBridge() {
             }
         });
     });
+
+    ipcMain.on("vott:open-error-log", () => {
+        const logPath = getErrorLogPath();
+        fs.closeSync(fs.openSync(logPath, "a"));
+        shell.openPath(logPath).then((errorMessage) => {
+            if (errorMessage) {
+                console.warn(errorMessage);
+            }
+        });
+    });
+}
+
+function normalizeMenuRole(role: string): string {
+    return role ? role.toLowerCase() : null;
+}
+
+function executeMenuRole(role: string, browserWindow: BrowserWindow): boolean {
+    if (!role || !browserWindow || browserWindow.isDestroyed()) {
+        return false;
+    }
+
+    const webContents = browserWindow.webContents;
+    switch (role) {
+        case "reload":
+            browserWindow.reload();
+            return true;
+        case "toggledevtools":
+            webContents.toggleDevTools();
+            return true;
+        case "togglefullscreen":
+            browserWindow.setFullScreen(!browserWindow.isFullScreen());
+            return true;
+        case "resetzoom":
+            webContents.setZoomLevel(0);
+            return true;
+        case "zoomin":
+            webContents.setZoomLevel(webContents.getZoomLevel() + 1);
+            return true;
+        case "zoomout":
+            webContents.setZoomLevel(webContents.getZoomLevel() - 1);
+            return true;
+        default:
+            return false;
+    }
 }
 
 function registerWindowStateEvents(browserWindow: BrowserWindow) {
@@ -217,9 +350,28 @@ function registerWindowStateEvents(browserWindow: BrowserWindow) {
             logMainTiming(`window-${eventName}`);
             if (!browserWindow.isDestroyed()) {
                 browserWindow.webContents.send("vott:window-event", eventName);
+                if (eventName === "leave-full-screen") {
+                    forceWindowLayoutRefresh(browserWindow);
+                }
             }
         });
     });
+}
+
+function forceWindowLayoutRefresh(browserWindow: BrowserWindow): void {
+    setTimeout(() => {
+        if (!browserWindow || browserWindow.isDestroyed()) {
+            return;
+        }
+
+        const bounds = browserWindow.getBounds();
+        browserWindow.setBounds({
+            ...bounds,
+            width: bounds.width + 1,
+        });
+        browserWindow.setBounds(bounds);
+        browserWindow.webContents.send("vott:window-event", "resize");
+    }, 100);
 }
 
 function serializeMenu(menu: Electron.Menu): any {

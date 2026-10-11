@@ -21,6 +21,7 @@ export const korean: IAppStrings = {
         maximize: "최대화", // Maximize,
         restore: "되돌리기", // Restore,
         close: "닫기", // Close"
+        fullscreenExitHint: "Esc 키를 눌러 전체 화면 종료",
     },
     homePage: {
         newProject: "새로운 프로젝트", // New Project,
@@ -100,6 +101,44 @@ export const korean: IAppStrings = {
             description: "모든 변경사항을 버리고 애플리케이션을 재시작 합니다", // Reload the app discarding all current changes,
             button: "애플리케이션 새로고침", // Refresh Application
         },
+        drawLog: {
+            description: "그리기 진단 로그 열기",
+            button: "로그 열기",
+        },
+        errorLog: {
+            description: "오류 진단 로그 열기",
+            button: "로그 열기",
+        },
+        shortcuts: {
+            title: "키보드 단축키",
+            annotation: "주석",
+            projectManagement: "프로젝트 관리",
+            application: "애플리케이션",
+            projectTags: "프로젝트 태그",
+            defaultSequence: "기본 순서",
+            lockHint: "Ctrl 키와 태그 단축키를 함께 누르면 해당 태그가 잠깁니다.",
+            selectTool: "선택 도구",
+            drawRectangle: "사각형 그리기",
+            drawPolygon: "다각형 그리기",
+            runAiDetection: "AI 감지 실행",
+            copyRectangle: "사각형 복사",
+            copyRegions: "영역 복사",
+            cutRegions: "영역 잘라내기",
+            pasteRegions: "영역 붙여넣기",
+            removeAllRegions: "모든 영역 제거",
+            videoStepBack: "비디오 뒤로 이동",
+            videoStepForward: "비디오 앞으로 이동",
+            previousAsset: "이전 에셋",
+            nextAsset: "다음 에셋",
+            saveProject: "프로젝트 저장",
+            exportProject: "프로젝트 내보내기",
+            activeLearning: "액티브 러닝",
+            help: "도움말",
+            reloadApplication: "애플리케이션 다시 로드",
+            toggleDeveloperTools: "개발자 도구 전환",
+            toggleFullScreen: "전체 화면 전환",
+            exitFullScreen: "전체 화면 종료",
+        },
         language: {
             description: "UI 언어"
         },
@@ -161,6 +200,7 @@ export const korean: IAppStrings = {
         modal: {
             name: "태그 이름", // Tag Name,
             color: "태그 색상", // Tag Color"
+            shortcut: "단축키",
         },
         colors: {
             white: "하얀색",  // White,
@@ -182,6 +222,11 @@ export const korean: IAppStrings = {
             existingName: "태그 이름이 이미 존재합니다. 다른 이름을 입력하십시오",  // Tag name already exists. Choose another name,
             emptyName: "빈 태그 이름을 가질 수 없습니다", // Cannot have an empty tag name,
             unknownTagName: "알 수 없는 태그 이름",  // Unknown"
+            nameExists: "태그 이름 ${name}이 이미 존재합니다",
+            shortcutReserved: "단축키 ${hotkey}는 시스템에서 예약되어 있습니다",
+            shortcutDuplicate: "단축키 ${hotkey}는 다른 태그에서 이미 사용 중입니다",
+            shortcutTooltip: "단축키: ${hotkey}",
+            editTooltip: "클릭하여 색상과 단축키 설정",
         },
         toolbar: {
             add: "새 태그 추가", // Add new tag,

@@ -1,5 +1,56 @@
 import { contextBridge, ipcRenderer } from "electron";
 
+function serializeError(error: any): object {
+    if (!error) {
+        return { message: String(error) };
+    }
+
+    return {
+        name: error.name,
+        message: error.message || String(error),
+        stack: error.stack,
+    };
+}
+
+function writeRendererErrorLog(label: string, data: object = {}) {
+    try {
+        ipcRenderer.send("vott:error-log", {
+            label,
+            time: new Date().toISOString(),
+            url: window.location.href,
+            ...data,
+        });
+    } catch (error) {
+        // Avoid throwing from the error logger itself.
+    }
+}
+
+window.addEventListener("error", (event) => {
+    writeRendererErrorLog("window-error", {
+        colno: event.colno,
+        error: serializeError(event.error),
+        filename: event.filename,
+        lineno: event.lineno,
+        message: event.message,
+    });
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+    writeRendererErrorLog("unhandled-rejection", {
+        reason: serializeError(event.reason),
+    });
+});
+
+contextBridge.exposeInMainWorld("process", {
+    env: {
+        NODE_ENV: process.env.NODE_ENV || (process.env.ELECTRON_START_URL ? "development" : "production"),
+        PUBLIC_URL: process.env.PUBLIC_URL || "",
+        REACT_APP_COMMIT_SHA: process.env.REACT_APP_COMMIT_SHA || "",
+        REACT_APP_VERSION: process.env.REACT_APP_VERSION || "",
+    },
+    platform: process.platform,
+});
+
 function restoreMenuItem(menuItem: any): any {
     const restoredMenuItem = { ...menuItem };
 
@@ -38,6 +89,7 @@ contextBridge.exposeInMainWorld("vottElectron", {
         },
         isMaximized: () => ipcRenderer.sendSync("vott:get-window-state").isMaximized,
         isFullScreen: () => ipcRenderer.sendSync("vott:get-window-state").isFullScreen,
+        setFullScreen: (isFullScreen: boolean) => ipcRenderer.send("vott:set-full-screen", isFullScreen),
         setTitle: (title: string) => ipcRenderer.send("vott:set-window-title", title),
         minimize: () => ipcRenderer.send("vott:window-command", "minimize"),
         maximize: () => ipcRenderer.send("vott:window-command", "maximize"),
@@ -58,8 +110,11 @@ contextBridge.exposeInMainWorld("vottElectron", {
     },
     diagnostics: {
         getDrawTimingLogPath: () => ipcRenderer.sendSync("vott:get-draw-timing-log-path"),
+        getErrorLogPath: () => ipcRenderer.sendSync("vott:get-error-log-path"),
         clearDrawTimingLog: () => ipcRenderer.send("vott:clear-draw-timing-log"),
         openDrawTimingLog: () => ipcRenderer.send("vott:open-draw-timing-log"),
+        openErrorLog: () => ipcRenderer.send("vott:open-error-log"),
         writeDrawTimingLog: (line: string) => ipcRenderer.send("vott:draw-timing-log", line),
+        writeErrorLog: (entry: object) => ipcRenderer.send("vott:error-log", entry),
     },
 });

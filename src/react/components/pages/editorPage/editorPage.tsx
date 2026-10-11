@@ -42,7 +42,8 @@ const MIN_THUMBNAIL_WIDTH = 175;
 const MAX_THUMBNAIL_WIDTH = 400;
 
 function normalizeThumbnailSize(size: ISize): ISize {
-    const width = Math.max(MIN_THUMBNAIL_WIDTH, Math.min(MAX_THUMBNAIL_WIDTH, size.width));
+    const requestedWidth = size && Number.isFinite(size.width) ? size.width : MIN_THUMBNAIL_WIDTH;
+    const width = Math.max(MIN_THUMBNAIL_WIDTH, Math.min(MAX_THUMBNAIL_WIDTH, requestedWidth));
     return {
         width,
         height: width / (4 / 3),
@@ -229,8 +230,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             return (<div>Loading...</div>);
         }
 
-        const tagHotkeys = getTagHotkeys(this.props.appSettings);
-        const tagHotkeyRegistrations = getTagHotkeyRegistrations(this.props.appSettings);
+        const tagHotkeys = getTagHotkeys(this.props.appSettings, this.props.project.tags);
+        const tagHotkeyRegistrations = getTagHotkeyRegistrations(this.props.appSettings, this.props.project.tags);
 
         return (
             <div className="editor-page">
@@ -421,6 +422,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param newWidth The new sidebar width
      */
     private onSideBarResize = (newWidth: number) => {
+        if (!Number.isFinite(newWidth)) {
+            return;
+        }
+
         this.setState({
             thumbnailSize: normalizeThumbnailSize({
                 width: newWidth,
@@ -508,7 +513,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private getTagFromKeyboardEvent = (event: KeyboardEvent): ITag => {
-        const index = getTagIndexFromHotkeys(getTagHotkeys(this.props.appSettings), event.key);
+        const index = getTagIndexFromHotkeys(getTagHotkeys(this.props.appSettings, this.props.project.tags), event.key);
         const tags = this.props.project.tags;
         if (index >= 0 && index < tags.length) {
             return tags[index];

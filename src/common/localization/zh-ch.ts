@@ -21,6 +21,7 @@ export const chinese: IAppStrings = {
         maximize: "最大化", // Maximize
         restore: "复原", // Restore
         close: "关闭", // Close
+        fullscreenExitHint: "按 Esc 退出全屏",
     },
     homePage: {
         newProject: "新项目", // New Project
@@ -100,6 +101,44 @@ export const chinese: IAppStrings = {
             description: "重新加载应用，放弃当前所有更改", // Reload the app discarding all current changes
             button: "刷新应用", // Refresh Application
         },
+        drawLog: {
+            description: "打开绘制诊断日志",
+            button: "打开日志",
+        },
+        errorLog: {
+            description: "打开错误诊断日志",
+            button: "打开日志",
+        },
+        shortcuts: {
+            title: "快捷键总览",
+            annotation: "标注功能",
+            projectManagement: "项目管理",
+            application: "应用程序",
+            projectTags: "项目标签",
+            defaultSequence: "默认序列",
+            lockHint: "按住 Ctrl 再按标签快捷键可锁定该标签。",
+            selectTool: "选择工具",
+            drawRectangle: "绘制矩形",
+            drawPolygon: "绘制多边形",
+            runAiDetection: "运行 AI 检测",
+            copyRectangle: "复制矩形",
+            copyRegions: "复制区域",
+            cutRegions: "剪切区域",
+            pasteRegions: "粘贴区域",
+            removeAllRegions: "删除全部区域",
+            videoStepBack: "视频后退一步",
+            videoStepForward: "视频前进一步",
+            previousAsset: "上一个素材",
+            nextAsset: "下一个素材",
+            saveProject: "保存项目",
+            exportProject: "导出项目",
+            activeLearning: "主动学习",
+            help: "帮助",
+            reloadApplication: "重新加载应用",
+            toggleDeveloperTools: "切换开发者工具",
+            toggleFullScreen: "切换全屏",
+            exitFullScreen: "退出全屏",
+        },
         language: {
             description: "UI 语言"
         },
@@ -161,6 +200,7 @@ export const chinese: IAppStrings = {
         modal: {
             name: "标签名称", // Tag Name
             color: "标签颜色", // Tag Color
+            shortcut: "快捷键",
         },
         colors: {
             white: "白色", // White
@@ -182,6 +222,11 @@ export const chinese: IAppStrings = {
             existingName: "标签名称已存在。请选择另一个名字", // Tag name already exists. Choose another name
             emptyName: "标签名称不能为空", // Cannot have an empty tag name
             unknownTagName: "未知", // Unknown
+            nameExists: "标签名称 ${name} 已存在",
+            shortcutReserved: "快捷键 ${hotkey} 已被系统占用",
+            shortcutDuplicate: "快捷键 ${hotkey} 已被其他标签使用",
+            shortcutTooltip: "快捷键：${hotkey}",
+            editTooltip: "点击设置颜色和快捷键",
         },
         toolbar: {
             add: "添加标签", // Add new tag

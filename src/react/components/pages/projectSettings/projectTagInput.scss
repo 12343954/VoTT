@@ -1,7 +1,7 @@
 .project-tag-color-picker {
   position: fixed;
   z-index: 10000;
-  width: 220px;
+  width: 260px;
   border: 1px solid rgba(255, 255, 255, .22);
   border-radius: 4px;
   background: #2f3439;
@@ -39,9 +39,24 @@
 
 .project-tag-color-picker-body {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+.project-tag-color-picker-body label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  font-size: 12px;
+}
+
+.project-tag-color-picker-row {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
 }
 
 .project-tag-color-picker-body input[type="color"] {
@@ -61,4 +76,105 @@
   border-radius: 3px;
   background: #1e2226;
   color: #fff;
+}
+
+.project-tag-field-error {
+  display: block;
+  margin-top: 4px;
+  color: #ff6b66;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.tag .tag-contents .tag-color-box {
+  position: relative;
+  width: 26px;
+  min-width: 26px;
+  height: 24px;
+  margin-right: 7px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .32);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.tag .tag-contents .tag-color-box:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .22), 0 0 0 2px rgba(255, 255, 255, .22);
+}
+
+.tag .tag-contents .tag-color-box::after {
+  content: attr(data-hotkey);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 2px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+  pointer-events: none;
+}
+
+.tag .tag-contents .tag-color-box[data-hotkey-tone="dark"]::after {
+  color: #050505;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, .65);
+}
+
+.tag .tag-contents .tag-color-box[data-hotkey-tone="light"]::after {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+}
+
+div.ReactTags__selected span.ReactTags__tag {
+  height: 48px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding-top: 0;
+  padding-bottom: 0;
+  vertical-align: top;
+}
+
+div.ReactTags__tagInput {
+  height: 48px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  vertical-align: top;
+  width: 230px;
+}
+
+div.ReactTags__selected span.ReactTags__tag .tag {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+.tag .tag-contents {
+  min-height: 100%;
+  align-items: center;
+}
+
+div.ReactTags__selected span.ReactTags__tag span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 24px;
+  padding-top: 2px;
+}
+
+div.ReactTags__selected a.ReactTags__remove {
+  line-height: 48px;
+  padding-top: 1px;
+}
+
+div.ReactTags__tagInput input.ReactTags__tagInputField,
+div.ReactTags__tagInput input.ReactTags__tagInputField:focus {
+  width: 230px;
+  height: 48px;
+  padding: 0 10px;
+  font-size: 24px;
+  line-height: 48px;
 }

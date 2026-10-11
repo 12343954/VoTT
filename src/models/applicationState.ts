@@ -90,7 +90,6 @@ export interface IAppSettings {
     devToolsEnabled: boolean;
     securityTokens: ISecurityToken[];
     thumbnailSize?: ISize;
-    tagHotkeys?: string[];
 }
 
 export interface IUser {
@@ -151,10 +150,12 @@ export interface IFileInfo {
  * @description - Defines the structure of a VoTT tag
  * @member name - User defined name
  * @member color - User editable color associated to tag
+ * @member hotkey - Optional keyboard shortcut associated to tag
  */
 export interface ITag {
     name: string;
     color: string;
+    hotkey?: string;
 }
 
 /**

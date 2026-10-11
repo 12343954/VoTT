@@ -1,8 +1,7 @@
 import React from "react";
 import Form, { FormValidation, ISubmitEvent, IChangeEvent, Widget } from "react-jsonschema-form";
-import { TagEditorModal } from "vott-react";
 import { addLocValues, strings } from "../../../../common/strings";
-import { IConnection, IProject, ITag, IAppSettings } from "../../../../models/applicationState";
+import { IConnection, IProject, IAppSettings } from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import { ConnectionPickerWithRouter } from "../../common/connectionPicker/connectionPicker";
 import { CustomField, CustomWidget } from "../../common/customField/customField";
@@ -64,7 +63,6 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
     };
 
     private tagsInput: React.RefObject<ProjectTagInput>;
-    private tagEditorModal: React.RefObject<TagEditorModal>;
 
     // tslint:disable-next-line:no-var-requires
     private formSchema = addLocValues(require("./projectForm.json"));
@@ -82,13 +80,10 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
             },
         };
         this.tagsInput = React.createRef<ProjectTagInput>();
-        this.tagEditorModal = React.createRef<TagEditorModal>();
 
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onFormCancel = this.onFormCancel.bind(this);
         this.onFormValidate = this.onFormValidate.bind(this);
-        this.onTagShiftClick = this.onTagShiftClick.bind(this);
-        this.onTagModalOk = this.onTagModalOk.bind(this);
     }
 
     public componentDidMount(): void {
@@ -134,15 +129,6 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                         type="button"
                         onClick={this.onFormCancel}>{strings.common.cancel}</button>
                 </div>
-                <TagEditorModal
-                    ref={this.tagEditorModal}
-                    onOk={this.onTagModalOk}
-
-                    tagNameText={strings.tags.modal.name}
-                    tagColorText={strings.tags.modal.color}
-                    saveText={strings.common.save}
-                    cancelText={strings.common.cancel}
-                />
             </Form>
         );
     }
@@ -180,20 +166,10 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                     tags: props.formData,
                     onChange: props.onChange,
                     placeHolder: strings.tags.placeholder,
-                    onShiftTagClick: this.onTagShiftClick,
                     ref: this.tagsInput,
                 };
             }),
         };
-    }
-
-    private onTagShiftClick(tag: ITag) {
-        this.tagEditorModal.current.open(tag);
-    }
-
-    private onTagModalOk(oldTag: ITag, newTag: ITag) {
-        this.tagsInput.current.updateTag(oldTag, newTag);
-        this.tagEditorModal.current.close();
     }
 
     private onFormValidate(project: IProject, errors: FormValidation) {

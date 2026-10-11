@@ -1,12 +1,16 @@
-import { IAppSettings } from "../models/applicationState";
+import { IAppSettings, ITag } from "../models/applicationState";
 
-export const DEFAULT_TAG_HOTKEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+export const DEFAULT_TAG_HOTKEYS = [
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+    "F", "G", "J", "K", "L", "Z", "B", "N", "M", "T", "Y", "U", "I", "O",
+];
 
 export const RESERVED_HOTKEYS = [
     "V", "R", "P", "Q", "W", "S", "A", "D", "E",
     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
     "CmdOrCtrl+W", "CmdOrCtrl+D", "CmdOrCtrl+C", "CmdOrCtrl+X", "CmdOrCtrl+V",
     "CmdOrCtrl+Delete", "CmdOrCtrl+Backspace", "CmdOrCtrl+S", "CmdOrCtrl+E",
+    "CmdOrCtrl+H",
 ];
 
 export interface ITagHotkeyRegistration {
@@ -15,15 +19,17 @@ export interface ITagHotkeyRegistration {
     accelerators: string[];
 }
 
-export function getTagHotkeys(appSettings: IAppSettings): string[] {
-    return appSettings && appSettings.tagHotkeys && appSettings.tagHotkeys.length
-        ? appSettings.tagHotkeys
-        : DEFAULT_TAG_HOTKEYS;
+export function getTagHotkeys(appSettings: IAppSettings, tags?: ITag[]): string[] {
+    if (tags && tags.length) {
+        return tags.map((tag, index) => normalizeTagHotkey(tag.hotkey) || DEFAULT_TAG_HOTKEYS[index] || null);
+    }
+
+    return DEFAULT_TAG_HOTKEYS;
 }
 
-export function getTagHotkeyRegistrations(appSettings: IAppSettings): ITagHotkeyRegistration[] {
+export function getTagHotkeyRegistrations(appSettings: IAppSettings, tags?: ITag[]): ITagHotkeyRegistration[] {
     const usedHotkeys = new Set<string>();
-    return getTagHotkeys(appSettings)
+    return getTagHotkeys(appSettings, tags)
         .map((hotkey, index) => ({
             index,
             hotkey: normalizeTagHotkey(hotkey),

@@ -14,6 +14,7 @@ export interface IElectronHost {
         on: (eventName: string, listener: () => void) => void;
         isMaximized: () => boolean;
         isFullScreen: () => boolean;
+        setFullScreen: (isFullScreen: boolean) => void;
         setTitle: (title: string) => void;
         minimize: () => void;
         maximize: () => void;
@@ -25,9 +26,12 @@ export interface IElectronHost {
     };
     diagnostics: {
         getDrawTimingLogPath: () => string;
+        getErrorLogPath: () => string;
         clearDrawTimingLog: () => void;
         openDrawTimingLog: () => void;
+        openErrorLog: () => void;
         writeDrawTimingLog: (line: string) => void;
+        writeErrorLog: (entry: object) => void;
     };
 }
 
